@@ -1,0 +1,173 @@
+\documentclass{article}
+\usepackage[document]{ragged2e}
+\usepackage[utf8]{inputenc}
+\usepackage{amsfonts, amsmath}
+\usepackage{geometry}
+\usepackage{enumitem}
+\usepackage{parskip}
+\usepackage{setspace}
+
+%\baselineskip=20pt
+
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\B}{_\textit{B}}
+\newcommand{\Pol}{\mathbb{P}}
+
+\newcommand{\column}[3]{\begin{bmatrix}\ #1\ \\ \ #2\ \\ \ #3\ \end{bmatrix}}
+\newcommand{\twoxtwo}[4]{\begin{bmatrix}\ #1 & #2 \ \\ \ #3 & #4 \ \end{bmatrix}}
+
+%% In the original PDF, the top margin is 27mm
+\geometry{a4paper, left=30mm, right=30mm, top=30mm}
+
+%% Uncomment the following line to remove page numbers
+% \pagenumbering{gobble}
+
+\title{End-Semester Exam: Linear Algebra}
+\author{Indraprastha Institute of Information Technology, Delhi}
+\date{13th April, 2022}
+
+
+\begin{document}
+\setstretch{1.3}
+
+\maketitle
+
+\textbf{Duration:} 120 minutes \hfill \textbf{Maximum Marks:} 80 \\[5mm]
+
+\textbf{Instructions:}
+\begin{enumerate}
+    \item Solve any 8 of the given 9 questions.
+    \item Commence each answer to a question on a fresh page. If some part of a question is done later, it should also be commenced on a fresh page, and this should be clearly mentioned in the main question.
+    \item You may use without proof any result covered in the course (either in lecture or tutorial). However, it should be clearly identified. Results taken from other sources must be proved. \\
+\end{enumerate}
+
+
+\textbf{Question 1.}
+\begin{enumerate}[label=(\alph*), leftmargin=6.25mm]
+    \item (5 marks)
+    Find an LU-factorization of the following matrix:
+
+    $$A = \begin{bmatrix}
+        \ \ \ 1 & -2 & -4 & -3 \ \\
+        \ \ \ 2 & -7 & -7 & -6 \ \\
+        \ -1 & \ \ 2 & \ \ 6 & \ \ 4 \ \\
+    \end{bmatrix}$$
+
+    \item (5 marks)
+    Use the LU-factorization method to solve the linear system $A \textbf{x} = \textbf{b}$ where $A$ is the matrix given in part (a) and \textbf{b} is the vector given below.
+    Write down all the calculations involved.
+
+    $$\textbf{b} = \begin{bmatrix} \ \ \ 1 \\ \ \ 3 \\ \ -1 \ \end{bmatrix}$$
+\end{enumerate}
+
+
+\textbf{Question 2.} (10 marks)
+Find an SVD for the following matrix:
+$$ \begin{bmatrix} \ 1 & 2 \ \\ \ 0 & 0 \ \\ \ 1 & 2 \ \end{bmatrix}$$
+
+
+\textbf{Question 3.}
+Let $p(x) = x^2 + 7x + 9$.
+\begin{enumerate}[label=(\alph*), leftmargin=6.25mm]
+    \item (2 marks)
+    Find the coordinate vectors of $p(x), (p(x))^2, p'(x)$ and $(p'(x))^2$ with respect to the basis $\{ 1, x, x^2, x^3, x^4 \}$ of $\Pol_4$.
+
+    ($Note$: $\Pol_4$ is the same as $\R_4[t]$)
+
+    \item (6 marks) Consider the equation
+    $$x_1p(x) + x_2p'(x) + x_3(p(x))^2 + x_4(p'(x))^2 = 7$$
+    where $\textbf{x} = (x_1, x_2, x_3, x_4) \in \R^4$. Let
+    $$A = [[p(x)]_\mathcal{B} \ \ \ [(p(x))^2]_\mathcal{B} \ \ \ [p'(x)]_\mathcal{B} \ \ \ [(p'(x))^2]_\mathcal{B}],$$
+    the matrix formed by the coordinate vectors from part (a), and let \textbf{b} = $[7]_B$. Solve the system of equations $A \textbf{x} = \textbf{b}$.
+
+    \item (2 marks) Prove or disprove: $1 \in \text{Span}\{ p(x), (p(x))^2, p'(x), (p'(x))^2 \}$
+\end{enumerate}
+
+
+\textbf{Question 4.} Let $V = M_{2x2}(\R)$, the set of all $2 \times 2$ matrices having real entries. Let
+$$\mathcal{B} = \left \{ \twoxtwo{1}{0}{0}{1}, \twoxtwo{0}{1}{1}{0}, \twoxtwo{1}{1}{0}{0}, \twoxtwo{0}{1}{0}{0} \right \}$$
+
+Define $\langle .,. \rangle: V \times V \to \R$ by
+$$\langle v, w \rangle = [v]_\mathcal{B} \cdot [w]_\mathcal{B}, \  \forall v, w \in V,$$
+
+where $[v]_\mathcal{B}$ denotes the coordinates of $v$ with respect to the basis $\mathcal{B}$, of $V$.
+
+You may use the fact that $\left\langle .,. \right\rangle$ is an inner product on $V$ without proof.
+
+\begin{enumerate}[label=(\alph*), leftmargin=6.25mm]
+    \item (3 marks)
+    Prove or disprove: $\mathcal{B}$ is an orthonormal basis of V with respect to the inner product $\langle .,. \rangle$.
+
+    \item (7 marks) Let
+    $$\mathcal{A} = \left\{ \twoxtwo{1}{0}{0}{0}, \twoxtwo{0}{1}{0}{0}, \twoxtwo{0}{0}{1}{0}, \twoxtwo{0}{0}{0}{1} \right\}$$
+    Apply the Gram-Schmidt process to $\mathcal{A}$ to find an orthogonal basis of $V$, with respect to the inner product $\langle .,. \rangle$.
+\end{enumerate}
+
+
+\textbf{Question 5.} (10 marks) Let
+$$A = \begin{bmatrix}
+    \ \ 9 & -8 & \ \ 3 \ \\
+    \ 11 & \ 10 & \ \ 3 \ \\
+    \ \ 1 & -1 & -2 \ \\
+\end{bmatrix}$$
+Is $A$ diagonalizable? Justify your answer.
+
+\newpage
+
+\textbf{Question 6.}
+\begin{enumerate}[label=(\alph*), leftmargin=6.25mm]
+    \item (6 marks)
+    Find $\text{col}A,\ \text{null}A$ and $\text{row}A$ for the matrix
+    $$A = \begin{bmatrix}
+        \ 7 & 4 & -1 \ \\
+        \ 3 & 2 & -1 \ \\
+        \ 5 & 1 & \ 3 \\
+    \end{bmatrix}$$ and a basis for each of the three
+
+    \item (4 marks) Find an orthonormal basis for $(\text{null}(A))^\perp$.
+\end{enumerate}
+
+
+\textbf{Question 7.}
+\begin{enumerate}[label=(\alph*), leftmargin=6.25mm]
+    \item (5 marks)
+    Evaluate $\text{det}(A)$, where $A$ is the $(n-1) \times (n-1)$ matrix given below (answer in terms of a formula for $n \geq 2$).
+    $$\begin{bmatrix}
+        \ (n-1) & -1 & \ldots & \ldots & -1 \ \\
+        \ -1 & (n-1) & \ldots & \ldots & -1 \ \\
+        \ -1 & -1 & \ddots & & -1 \ \\
+        \ \vdots & \vdots & & \ddots & -1 \ \\
+        \ -1 & -1 & \ldots & & (n-1) \ \\
+    \end{bmatrix}$$
+    (In case it's not obvious, the diagonal entries of $A$ are $n-1$ and the rest of the entries are $-1$.)
+
+    \item (5 marks)
+    Determine the eigenvalues and corresponding eigenvectors of $A$.
+\end{enumerate}
+
+
+\textbf{Question 8.} (10 marks)
+Let $V$ b a finite-dimensional vector space over $F$, with $\text{dim}V = n$, and let $T \in L(V, V)$ with $(T - \lambda I)^n = 0$
+but $(T - \lambda I)^{n-1} \neq 0$, where $\lambda \in F$. Show that there exists an ordered basis $\mathcal{B}$ of $V$ such that
+
+$$[T]_\mathcal{B} = \begin{bmatrix}
+    \ \lambda & 0 & 0 & \ldots & 0 \ \\
+    \ 1 & \lambda & 0 & \ldots & 0 \ \\
+    \ 0 & 1 & \lambda & \ddots & 0 \ \\
+    \ \vdots & \vdots & \ddots & \ddots & 0 \ \\
+    \ 0 & 0 & \ldots & 1 & \lambda \\
+\end{bmatrix}$$
+
+
+\textbf{Question 9.} Let $V = \R^{n \times n}$ ($Note$: $\R^{n \times n}$ is the same as $M_{n \times n}(\R)$) and let $W = \{ A \in V\ |\ A\ \text{is skew-symmetric} \}$.
+(A square matrix $A$ is said to be \textit{skew-symmetric} if $A^T = -A$.)
+
+\begin{enumerate}[label=(\alph*), leftmargin=6.25mm]
+    \item (2 marks) Show that $W$ is a subspace of $V$.
+    \item (4 marks) Find a basis of $W$, and hence its dimension.
+    \item (4 marks) Prove or disprove: Every $A \in V$ satisfies $A = B + C$, where $B$ and $C$ are symmetric and skew-symmetric respectively.
+\end{enumerate}
+
+
+\end{document}

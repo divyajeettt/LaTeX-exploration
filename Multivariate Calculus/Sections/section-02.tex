@@ -1,0 +1,75 @@
+\section{Types of Points and Regions}
+
+\subsection{Types of Points}
+A point $\point$ in a region $S$ in the $xy$-plane is called:
+
+\begin{enumerate}
+    \item An \textbf{Interior Point} if there exists a disc centered at $\point$ that lies entirely in $S$.
+
+    \item A \textbf{Boundary Point} if every disc centered at $\point$ contains some points that lie inside $S$ and some
+    points that lie outside $S$.
+
+    \item An \textbf{Exterior Point} if it is neither an \textbf{Interior Point} nor a \textbf{Boundary Point}.
+\end{enumerate}
+
+\begin{figure}[htp]
+    \centering
+    \begin{tikzpicture}
+        \begin{axis}[
+            axis lines = middle,
+            axis equal,
+            xmin=-1.5, xmax=1.5, ymin=-1.5, ymax=1.5,
+            xlabel = $x$,
+            ylabel = $y$,
+            xticklabels = {,,},
+            yticklabels = {,,},
+            title = {Interior, Exterior, and Boundary Points}]
+
+            \draw (axis cs: 0, 0) circle [radius=100];
+            \addplot[scatter, only marks] coordinates{(0.45, 0.45) (-1, 0) (1, -1)};
+            \draw (axis cs: 0.45, 0.45) circle [radius=15];
+            \draw (axis cs: -1, 0) circle [radius=15];
+            \draw (axis cs: 1, -1) circle [radius=15];
+        \end{axis}
+    \end{tikzpicture}
+    \caption{$S = \{(x, y) \in \R^2\ |\ x^2 + y^2 = 1\}$}
+\end{figure}
+
+
+\subsection{Types of Regions}
+A region is said to be:
+
+\begin{enumerate}
+    \item \textbf{Open} if it ONLY contains interior points.
+    \item \textbf{Closed} if along with all interior points, it also contains ALL boundary points.
+    \item \textbf{Bounded} if it can be enclosed within a disc of (fixed) finite radius.
+    \item \textbf{Unbounded} if it cannot be enclosed within a disc of finite radius.
+\end{enumerate}
+
+
+\subsection{Examples}
+
+\begin{example}
+    \normalfont
+    Open unit disc: $S = \{(x, y) \in \R^2\ |\ x^2 + y^2 < 1\}$
+\end{example}
+
+\begin{example}
+    \normalfont
+    Boundary of unit disc: $S = \{(x, y) \in \R^2\ |\ x^2 + y^2 = 1\}$
+\end{example}
+
+\begin{example}
+    \normalfont
+    Closed unit disc: $S = \{(x, y) \in \R^2\ |\ x^2 + y^2 \leq 1\}$
+\end{example}
+
+\begin{example}
+    \normalfont
+    \textbf{Bounded Regions:} Circles, Ellipses, Rectangles, etc.
+\end{example}
+
+\begin{example}
+    \normalfont
+    \textbf{Unbounded Regions:} Parabolas, Hyperbolas, Planes, etc.
+\end{example}

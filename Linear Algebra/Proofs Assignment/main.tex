@@ -1,0 +1,109 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage{geometry}
+\usepackage{parskip}
+\usepackage{hyperref}
+\usepackage{enumitem}
+\usepackage{amsfonts, amsmath, amssymb, amsthm}
+
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{corollary}{Corollary}
+\newtheorem{definition}{Definition}
+\newtheorem{problem}{Problem}
+
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\diff}[2]{#1 \setminus #2}
+
+\geometry{a4paper, left=30mm, right=30mm, top=30mm}
+
+\title{
+    {\huge Linear Algebra Proofs Assignment} \\
+    {\large Problem taken from \textit{Linear Algebra Done Right, 3rd edition}} \\
+}
+
+\author{\href{mailto:divyajeet21529@iiitd.ac.in}{Divyajeet Singh (2021529)}}
+
+\date{February 18, 2022}
+
+
+\begin{document}
+\maketitle
+
+\section{Theorems and Definitions}
+    \begin{theorem}
+        A subspace S of vector space V is closed under vector addition, i.e.:
+        \begin{equation}
+            \label{addition} \forall x_1, x_2 \in S,\ x_1 + x_2 \in S
+        \end{equation}
+    \end{theorem}
+
+    \begin{theorem}
+        A subspace S of vector space V is closed under scalar multiplication, i.e.:
+        \begin{equation}
+            \label{multiplication} \forall x \in S,\ c \in \R,\ cx \in S
+        \end{equation}
+    \end{theorem}
+
+    \begin{corollary}[From \textbf{Theorem 1} and \textbf{Theorem 2}]
+        A subspace S of vector space V is closed under the operation of taking linear combinations, i.e.:
+        \begin{equation}
+            \label{LC}
+            \forall x_1, x_2, \ldots, x_n \in S,\ c_1, c_2, \ldots, c_n \in \R,\ c_1x_1 + c_2x_2 + \cdots + c_nx_n \in S
+        \end{equation}
+    \end{corollary}
+
+    \begin{definition}[Set-Minus]
+        The Set-Minus operator is used to denote the difference of two sets.
+        \begin{equation}
+            \label{set-minus} \diff{A}{B} = \{ x :\ x \in A,\ x \notin B \}
+        \end{equation}
+    \end{definition}
+
+\pagebreak
+
+\section{Problem Statement and Solution}
+    \begin{problem}
+        Prove that the union of two subspaces of a vector space is a subspace iff one of the two subspaces is contained in the other.
+    \end{problem}
+
+    \begin{proof}
+        Given: $A$ and $B$ are two subspaces of $V$.
+
+        ($\impliedby$)
+
+        Suppose $A \subseteq B$. Then $A \cup B = B$. $B$ is already a subspace of $V$.
+
+        Similarly, $B \subseteq A \implies A \cup B = A$. $A$ is already a subspace of $V$.
+
+        $\therefore$ In either case, $A \cup B$ is a subspace of $V$.
+
+        ($\implies$)
+
+        Assume: $A \nsubseteq B$ and $B \nsubseteq A$. Then,
+        \begin{enumerate}[label=(\alph*), leftmargin=0.5in]
+            \item $\exists\ x_1 \in \diff{A}{B}$, i.e., by (\ref{set-minus}), $x_1 \in A$ and $x_1 \notin B$.
+            \item $\exists\ x_2 \in \diff{B}{A}$, i.e., by (\ref{set-minus}), $x_2 \in B$ and $x_2 \notin A$.
+        \end{enumerate}
+
+        Let $C = A \cup B$. Then, $x_1 \in C$ and $x_2 \in C$. Since $C$ is a subspace of $V$, it is closed under vector addition by (\ref{addition}). Then:
+        \begin{equation}
+            \label{proof-1} x_1 + x_2 \in C \text{, i.e., } x_1 + x_2 \in A \cup B
+        \end{equation}
+
+        Then, either $x_1 + x_2 \in A$ or $x_1 + x_2 \in B$.
+
+        \begin{enumerate}[label=(\alph*), leftmargin=0.5in]
+            \item
+            Suppose $x_1 + x_2 \in A$. Then we write $x_2 = (x_1 + x_2) - x_1$, i.e. $x_2$ is a linear combination of elements of $A$. Hence, by (\ref{LC}), $x_2 \in A$.
+            This contradicts our assumption that $x_2 \notin A$.
+
+            \item
+            Next, suppose $x_1 + x_2 \in B$. Then we write $x_1 = (x_1 + x_2) - x_2$, i.e. $x_1$ is a linear combination of elements of $B$. Hence, by (\ref{LC}), $x_1 \in B$.
+            This contradicts our assumption that $x_1 \notin B$.
+        \end{enumerate}
+        $\therefore$ In either case, we reach a contradiction, and thus, our assumption must be incorrect.
+
+        Therefore, it must be the case that either $A \subseteq B$ or $B \subseteq A$, i.e., one of the two subspaces must be contained in the other. \\
+    \end{proof}
+\end{document}

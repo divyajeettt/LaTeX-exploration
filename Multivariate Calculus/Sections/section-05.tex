@@ -1,0 +1,62 @@
+\section{Continuity}
+
+\subsection{Definition of continuity}
+A function $f(x, y)$ is said to be \textit{continuous} at a point $\point \in \R^2$ if:
+\begin{enumerate}
+    \item $f$ is defined at $\point$.
+    \item $\lim_{(x, y) \to \point} f(x, y) = f\point$
+\end{enumerate}
+
+\begin{example} \normalfont Find out whether the given function is continuous:
+    \begin{equation*}
+        f(x, y) =
+        \begin{cases}
+            \frac{(x - y)^2}{x^2 + y^2} & (x, y) \neq (0, 0) \\
+            0 & (x, y) = (0, 0)
+        \end{cases}
+    \end{equation*}
+
+    Along the line $y = mx$, the limit becomes:
+    $$\lim_{x \to 0} \frac{(x - mx)^2}{x^2 + m^2x^2} = \lim_{x \to 0} \frac{(1-m)^2}{1 + m^2} = \frac{(1-m)^2}{1 + m^2} $$
+    which is obviously dependent on $m$. Hence, the limit does not exist, and so the function is discontinuous.
+\end{example}
+
+\begin{example} \normalfont Find out whether the given function is continuous:
+    \begin{equation*}
+        f(x, y) =
+        \begin{cases}
+            \frac{2x(x^2 - y^2)}{x^2 + y^2} & (x, y) \neq (0, 0) \\
+            0 & (x, y) = (0, 0)
+        \end{cases}
+    \end{equation*}
+
+    Let $\epsilon > 0$ be given. Then, we must have:
+    $$\left| \frac{2x(x^2 - y^2)}{x^2 + y^2} - 0 \right| \leq \epsilon \text{ whenever } |x-0| < \delta,\ |y-0| < \delta$$
+    \begin{align*}
+        \text{Then } \left| \frac{2x^3}{x^2 + y^2} - \frac{2xy^2}{x^2 + y^2} \right|
+        &\leq \left| \frac{2x^3}{x^2 + y^2} \right| + \left| \frac{2xy^2}{x^2 + y^2} \right| \\
+        &\leq 2|x| + 2|x| \\
+        &\leq 4 \delta
+    \end{align*}
+
+    Hence, the limit exists and is equal to 0. $\therefore f(x, y)$ is continuous.
+\end{example}
+
+
+\subsection{Properties of continuity}
+\begin{enumerate}
+    \item \textbf{Addition Rule:}
+    The sum of two (or more) continuous functions is continuous, i.e. $f(x, y) + g(x, y)$ is continuous whenever
+    $f(x, y)$ and $g(x, y)$ are continuous.
+
+    \item \textbf{Scaling Rule:}
+    Scaling a continuous function $f(x, y)$ by some $c \in \R$ results in a continuous function ($c \cdot f(x, y)$).
+
+    \item \textbf{Multiplication Rule:}
+    The product of two (or more) continuous functions is continuous, i.e. $f(x, y) \cdot g(x, y)$ is continuous whenever
+    $f(x, y)$ and $g(x, y)$ are continuous.
+
+    \item \textbf{Composition Rule:}
+    The function composition of two (or more) continuous functions is continuous, i.e. $f \circ g(x, y)$ is continuous whenever
+    $f(x)$ and $g(x, y)$ are continuous.
+\end{enumerate}

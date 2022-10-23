@@ -1,0 +1,92 @@
+\section{Limits}
+
+\subsection{Limits of functions in one variable}
+Recap, the limit of a function $f(x)$ at $x = x_0$ is given by:
+\begin{equation}
+    \lim_{x \to x_0} f(x) = L
+\end{equation}
+i.e., as $x$ \textit{approaches} $x_0$, $f(x)$ \textit{approaches} $L$.
+
+
+\subsection{Limits of functions in two variables}
+The limit of a function $f(x, y)$ at a point $\point \in \R^2$ is given by:
+\begin{equation}
+    \lim_{(x, y) \to \point} f(x, y) = L
+\end{equation}
+i.e., as $(x, y)$ \textit{approaches} $\point$, $f(x, y)$ \textit{approaches} $L$. The same concept of limit
+in \textit{one} dimiensions is easily generalized to higher dimensions, taking care of the fact that in higher
+dimensions, there are more ways to \textit{approach} a point.
+
+
+\subsection{The \texorpdfstring{$\epsilon$-$\delta$}{e-d} definition of a limit}
+(In general) The limit of a function $f(x, y)$ as $(x, y)$ approaches $\point$ is equal to $L$ if for every $\epsilon > 0$,
+there exists a corresponding $\delta \in \R^+$, such that for all $x$
+\begin{equation}
+    |f(x, y) - L| < \epsilon \text{ whenever } \lVert (x, y) - \point \rVert < \delta
+\end{equation}
+
+\begin{example}
+    \normalfont Find the limit of $f(x, y) = 2x + y$ at the point $(1, 2)$ using the $\epsilon$-$\delta$
+    definition of the limit.
+
+    We need to find:
+    $$\lim_{(x, y) \to (1, 2)} (2x + y) = ?$$
+    Assuming the limit exists, let $\epsilon > 0$ be some real value. Let $L = f(1, 2) = 4$. We need to make sure that
+    $$|2x + y - 4| < \epsilon \text{ whenever } \lVert(x, y) - (1, 2) \rVert = \sqrt{(x-1)^2 + (y-2)^2} < \delta$$
+    \begin{align*}
+        |2x + y - 4| &= |2 (x-1) + y - 2| \\
+        &\leq |2 (x-1)| + |y - 2| \\
+        &\leq 3 \delta
+    \end{align*}
+    If we take $\delta = \epsilon/3$, then $|2x + y - 4| < \epsilon$ whenever $|x - 1| < \delta$ and $|y - 2| < \delta$.
+    Hence, the limit exists and is equal to 4.
+\end{example}
+
+
+\subsection{Properties of limits}
+\begin{enumerate}
+    \item The limit of a function $f(x, y)$ at a point $\point \in \R^2$ if exists, is unique.
+
+    \item Substituting $x - x_0 = r\cos{\theta}$ and $y - y_0 = r\sin{\theta}$ where $r^2 = (x - x_0)^2 + (y - y_0)^2$
+    and $\text{tan}\theta = \frac{x - x_0}{y - y_0}$, the definition of the limit can be expressed as:
+
+    $\forall \epsilon > 0,\ \exists\ \delta > 0$, such that $\forall\ (r, \theta) \in \R^2,\ |r| > \delta \implies$
+    $|f(r\cos{\theta}, r\sin{\theta}) - L| < \epsilon$
+
+    \begin{example}
+        \normalfont Prove that: $$\lim_{(x, y) \to (0, 0)} \left( \frac{x^3}{x^2 + y^2} \right) = 0$$
+
+        Let $x = r\cos{\theta}$ and $y = r\sin{\theta}$. Then,
+        $$\lim_{r \to 0} r\sin^3{\theta} = 0,\ \forall \ \theta \in \R$$
+        So, let $L = 0$ and $\epsilon > 0$ such that:
+        \begin{align*}
+            |r\cos^3{\theta} - 0| &\leq |r| < \delta \\
+            \text{and }|r\cos^3{\theta} - 0| &\leq \epsilon \text{ whenever } |r| < \delta \\
+            \left| \frac{x^3}{x^2 + y^2} \right| = |x| \left| \frac{x^2}{x^2 + y^2} \right| \leq |x| &\leq \epsilon \text{ whenever }
+            \sqrt{x^2 + y^2} < \delta
+        \end{align*}
+        So, $|f(x, y) - 0| \leq \delta$. Hence, proved.
+    \end{example}
+
+    \item \textbf{The two path test for non-existence of a limit} \\
+    If the function $f(x, y)$ takes different values as $(x, y)$ approaches $\point$ from different paths, then the limit
+    of $f(x, y)$ at the point $\point$ does not exist.
+
+    \item \textbf{Path independence of limit} \\
+    If the limit of a function $f(x, y)$ at a point $\point \in \R^2$ exists, then regardless of the path from which $(x, y)$
+    approaches $\point$, the function takes the same value.
+
+    \begin{example}
+        \normalfont Find the limit:
+        $$\lim_{(x, y) \to (0, 0)} \left( \frac{xy}{x^2 + y^2} \right)$$
+
+        Along the $x$-axis, $y = 0$; the $y$-axis, $x = 0$; and the path $y = x$, we have (respectively):
+        $$\lim_{y \to 0} \frac{0}{x^2} = \lim_{x \to 0} \frac{0}{y^2} = 0 \neq \lim_{x \to 0} \frac{x^2}{2x^2} = \frac{1}{2}$$
+        Hence, the limit does not exist.
+    \end{example}
+
+    \item If the (two-dimensional) limit $\lim_{(x, y) \to \point} f(x, y) = L$
+    exists, then the (iterated) limits
+    $$\lim_{x \to x_0}\left( \lim_{y \to y_0} f(x, y) \right) \text{ and } \lim_{y \to y_0}\left( \lim_{x \to x_0} f(x, y) \right)$$
+    exist, and are equal to $L$, provided the (one-dimensional) limits exist.
+\end{enumerate}

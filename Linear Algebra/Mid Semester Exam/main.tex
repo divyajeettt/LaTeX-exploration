@@ -1,0 +1,128 @@
+\documentclass{article}
+\usepackage[document]{ragged2e}
+\usepackage[utf8]{inputenc}
+\usepackage{amsfonts, amsmath}
+\usepackage{geometry}
+\usepackage{enumitem}
+\usepackage{parskip}
+\usepackage{setspace}
+
+%\baselineskip=20pt
+
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\N}{\mathbb{N}}
+
+\newcommand{\column}[3]{\begin{bmatrix}\ #1\ \\ \ #2\ \\ \ #3\ \end{bmatrix}}
+
+%% In the original PDF, the top margin is 27mm
+\geometry{a4paper, left=30mm, right=30mm, top=30mm}
+
+%% Uncomment the following line to remove page numbers
+% \pagenumbering{gobble}
+
+\title{Mid-Semester Exam: Linear Algebra}
+\author{Indraprastha Institute of Information Technology, Delhi}
+\date{19th February, 2022}
+
+
+\begin{document}
+\setstretch{1.3}
+
+\maketitle
+
+\textbf{Duration:} 60 minutes \hfill \textbf{Maximum Marks:} 50 \\[5mm]
+
+\textbf{Question 1.}
+\begin{enumerate}[label=(\alph*), leftmargin=6.25mm]
+    \item (5 marks) Let $A$ and $B$ be $m \times n$ matrices (where $m, n \in \N$) having columns $\textbf{a}_1, \ldots , \textbf{a}_n$, and $\textbf{b}_1, \ldots, \textbf{b}_n$, respectively. Suppose $\textbf{b}_j = j^2 \textbf{a}_{j-1}$ for $j = 2, \ldots, n$ and $\textbf{b}_1 = \textbf{a}_n$. Find an $ n \times n$ matrix $E$ such that $AE = B$.
+
+    \item (5 marks) Let $A = \begin{bmatrix}
+        \ 0 & 0 & 1\ \\
+        \ 4 & 0 & 0\ \\
+        \ 0 & 9 & 0\ \\
+    \end{bmatrix}$. Let $\textbf{b}_1 = \column{1}{0}{1}$ and $\textbf{b}_2 = \column{1}{5}{7}$. Solve the equations
+
+    $A\textbf{x} = \textbf{b}_1$ and $A\textbf{x} = \textbf{b}_2$ by row reducing exactly one matrix. \\[8mm]
+\end{enumerate}
+
+
+\textbf{Question 2.} (10 marks)
+All subparts of this question carry equal marks.
+
+In each part of this question, $V$ is a vector space and $W$ is a subset of $V$. Decide whether $W$ is a subspace of $V$. Justify your answers with a short proof or counterexample.
+
+\begin{enumerate}[label=(\alph*), leftmargin=6.25mm]
+    \item
+    $V = \R(t)$, the set of $all$ polynomials in $t$ which have real coefficients (please note that the degrees of the polynomials are not bounded). \\
+    $W = \{ p(t) = a_0 + \cdots + a_nt^n \ |\ a_{2k} = 0$, if $k \in \N$ and $2k \in \{ 0, \ldots, n \} \}$
+
+    \item
+    $V = \R^n$ \\
+    $W = \{ (x_1, \ldots, x_n)\ |\ x_1 + \cdots + x_n \ge 0 \}$
+
+    \item
+    $V = \R^n$ \\
+    $W = \{ (x_1, \ldots, x_n)\ |\ x_1^2 + \cdots + x_n^2 \ge 0 \}$
+
+    \item
+    $V = \R^\infty$, the set of all sequences indexed by $\N$ \\
+    Fix $k \in \N.$ \\
+    $W = \{ (a_n)\ |\ a_1 + \cdots + a_k = 0 \}$
+
+    \item
+    $V = \R^{n \times n}$, the set of all $n \times n$ matrices having real entries. \\
+    $(Note: \R^{n \times n}$ is the same as $M_n(\R) )$ \\
+    $W = \{ A\ |\ A$ is in reduced row echelon form$\}$
+\end{enumerate}
+
+\newpage
+
+\textbf{Question 3.} Let $A = \begin{bmatrix}
+    \ a & b\ \\
+    \ c & d\ \\
+\end{bmatrix}$, where $a, b, c, d \ge 0,\ a + c = b + d = 1$ and $A \neq I_2$. Let $ P = \begin{bmatrix}
+    \ b &\ \ 1\ \\
+    \ c & -1\ \\
+\end{bmatrix}$.
+
+\begin{enumerate}[label=(\alph*), leftmargin=6.25mm]
+    \item (7 marks)
+    Show that $P$ is invertible. Find $P^{-1}$ and $P^{-1}AP$.
+
+    \item (3 marks)
+    Find a formula for $A^n$. \\[8mm]
+\end{enumerate}
+
+
+\textbf{Question 4.} Let $f: \R \to \R$ be a function.
+
+\begin{enumerate}[label=(\alph*), leftmargin=6.25mm]
+    \item (4 marks)
+    Show that: If $\exists\ c \in \R \setminus \{ 0 \}$ such that $f(x) = cx,\ \forall x \in \R$, then the graph of $f$ is a proper nontrivial subspace of $\R^2$. \\
+    (The graph of a function $f: \R \to \R$ is defined as the set $\{ (x, y) \ |\ y = f(x)\}$.)
+
+    \item (1 mark)
+    What is the converse of the statement that is too be proved in part (a)?
+
+    \item (5 marks)
+    Is the converse that you stated in part (b) true? Justify with a short proof or an appropriate counterexample.
+\end{enumerate}
+
+$(Note:$ You may assume the following statement without proof - \\
+
+Any proper nontrivial subspace of $\R^2$ is of the form Span$\{ \vec{v} \}$ where $\vec{v}$ is a non-zero vector in $\R^2$.) \\[8mm]
+
+
+\textbf{Question 5.} (10 marks)
+Solve ONE of the following two problems (either part (a) or part (b)).
+
+\begin{enumerate}[label=(\alph*), leftmargin=6.25mm]
+    \item Prove or disprove: \\
+    If $\{ \vec{v}_1, \ldots, \vec{v}_n \}$ is a basis for a vector spave $V$, then so is $\{ \alpha_1 \vec{v}_1, \ldots,  \alpha_n \vec{v}_n \}$ where the $\alpha_i$ are non-zero scalars.
+
+    \item Prove or disprove: \\
+    If $\{ \vec{v}_1, \ldots, \vec{v}_n \}$ is a basis for a vector spave $V$, then so is $\{ \vec{v}_1, \vec{v}_1 + \vec{v}_2, \ldots,  \vec{v}_1 + \vec{v}_2 + \ldots + \vec{v}_n \}$.
+\end{enumerate}
+
+
+\end{document}

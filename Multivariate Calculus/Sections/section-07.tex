@@ -1,0 +1,141 @@
+\section{Directional Derivatives and Gradients}
+
+\subsection{Directional Derivatives}
+
+The partial derivatives $f_x$ and $f_y$ of a function $z = f(x, y)$ are the rates of change of the output $z$ of along the
+paths holding $y$ and $x$ constant, respectively. However, a derivative of a function can be found along any path.
+The derivative of a function along a path other than one parallel to the axes is called the \textbf{directional derivative}.
+
+The direction along which the derivative is calculated, is commonly notated by $\vec{u} = \langle u_1, u_2 \rangle$.
+
+Formally, the derivative of a function $f(x, y)$ at a point $P_0 = \point$ in the direction of the unit vector
+$\hat{u} = \langle u_1, u_2 \rangle$ is the number
+\begin{equation}
+    \left( \frac{df}{ds} \right)_{\hat{u}, P_0} = \ddvp = \lim_{s \to 0} \frac{f(x_0 + su_1, y_0 + su_2) - f\point}{s}
+\end{equation}
+
+provided the limit exists.
+
+\textbf{Reference Link:}
+\reference{https://www.youtube.com/watch?v=GJODOGq7cAY}{Directional Derivatives: What's the slope in any direction?}
+
+
+\subsection{Gradients}
+
+\subsubsection{Gradient of a function in two variables}
+The gradient (gradient) of a function $f(x, y)$ is the vector $\langle f_x, f_y \rangle$.
+\begin{equation}
+    \grad f = \llangle \frac{\del f}{\del x}, \frac{\del f}{\del y} \rrangle = \langle f_x, f_y\rangle
+\end{equation}
+To evaluate the gradient at any particular point $P_0 = \point \in \R^2$, the partial derivatives need to be evaluated
+at $P_0$.
+
+\subsubsection{Gradient of a function in \texorpdfstring{$n$}{n} variables}
+The gradient (gradient) of a function $f(x_1, x_2, \hdots, x_n)$ is the vector
+$\langle f_{x_1}, f_{x_2}, \hdots, f_{x_n} \rangle$.
+\begin{equation}
+    \grad f = \llangle \frac{\del f}{\del x_1}, \frac{\del f}{\del x_2}, \hdots, \frac{\del f}{\del x_n} \rrangle
+    = \langle f_x, f_y\rangle
+\end{equation}
+To evaluate the gradient at any particular point $P_0 = (x_{1_0}, x_{2_0}, \hdots, x_{n_0}) \in \R^n$, the partial
+derivatives need to be evaluated at $P_0$.
+
+\textbf{Reference Link:}
+\reference{https://www.youtube.com/watch?v=QQPz3eXXgQI}{Geometric Meaning of the Gradient Vector}
+
+
+\subsection{Relationship betwen Gradients and Directional Derivatives}
+The directional derivative is essentially (just like any other derivative) the rate of change of a function. The only
+For the directional derivative of a function $f(x, y)$ the input point $P_0 = \point$ is nudged along the line
+parametrized by $s$.
+
+Hence, given that $x = x_0 + su_1 \text{ and } y = y_0 + su_2,$
+\begin{align*}
+    \left( \frac{df}{ds} \right)_{\hat{u}, P_0} &= \frac{\del f}{\del x} \bigg|_{P_0} \frac{dx}{ds} +
+    \frac{\del f}{\del y} \bigg|_{P_0} \frac{dy}{ds} \\
+    &= \frac{\del f}{\del x} \bigg|_{P_0} u_1 + \frac{\del f}{\del y} \bigg|_{P_0} u_2 \\
+    &= \langle f_x, f_y \rangle \cdot \langle u_1, u_2 \rangle \\
+    &= (\grad f)_{P_0} \cdot \hat{u}
+\end{align*}
+
+
+\subsection{Directional Derivative as a Dot product}
+
+\begin{theorem}
+    [Directinal Derivative as a Dot product]
+    If $f(x, y)$ is differentiable in an open region containing the point $P_0 = \point$, then
+    \begin{equation}
+        \left( \frac{df}{ds} \right)_{\hat{u}, P_0} = \ddvp = (\grad f)_{P_0} \cdot \hat{u}
+    \end{equation}
+\end{theorem}
+
+\begin{example}
+    \normalfont Find the directional derivative of $f(x, y) = x^2 \sin{2y}$ at $(1, \pi/2)$ along $\langle 3, -4 \rangle$.
+
+    Given $P_0 = (1, \pi/2)$ and $\vec{u} = \langle 3, -4 \rangle \implies \hat{u} = \langle \frac{3}{5}, \frac{-4}{5} \rangle$
+    \begin{align*}
+        \grad f &= \llangle 2x \sin{2y},\ 2 x^2 \cos{2y} \rrangle \implies
+        (\grad f)_{P_0} = \langle 0, 2\rangle \\
+        \ddvp &= 0 \cdot \frac{3}{5} + 2 \cdot \frac{-4}{5} = 0 + \frac{-8}{5} = - \frac{8}{5}
+    \end{align*}
+\end{example}
+
+
+\subsection{Direction of maximum, minimum, and zero change}
+
+We can find the direction of extremum change of the function $f(x, y)$ by comparing the values of directional derivatives.
+If $\theta$ is the angle between the gradient of $f$ at $P_0$ and the direction $\hat{u}$,
+\begin{align*}
+    \ddv &= \grad f \cdot \hat{u} \\
+    \lVert \ddv \rVert &= \lVert \grad f \rVert\ \cos{\theta}
+\end{align*}
+
+And so the following three cases arise:
+\begin{enumerate}
+    \item $\theta = 0$: $\ddv$ is maximum, i.e. $\lVert \grad f \rVert$. $f$ increases the most rapidly
+    when $\hat{u}$ is in the direction of $\grad f$.
+
+    \item $\theta = \pi$: $\ddv$ is minimum, i.e. $- \lVert \grad f \rVert$. $f$ decreases the most rapidly
+    when $\hat{u}$ is in the direction of $\grad f$.
+
+    \item $\theta = \pi/2$: $\ddv = 0$, i.e. moving along $\hat{u}$ has no effect on $f$, i.e. the movement is along a contour.
+\end{enumerate}
+
+\begin{example}
+    \normalfont Find the directions of maximum increase, maximum decrease, and zero change of
+    $f(x, y) = \frac{x^2}{2} + \frac{y^2}{2}$ at the point $(1, 1)$.
+
+    The gradient of the function at $(1, 1)$ is $(\grad f)_{(1, 1)} = \langle x, y \rangle_{(1, 1)} = \langle 1, 1\rangle$.
+
+    \begin{enumerate}
+        \item
+        The function increases the most rapidly in the direction of $\grad f$. Therefore, the direction of maximum increase is
+        $$\hat{u} = \llangle \frac{1}{\sqrt{2}}, \frac{1}{\sqrt{2}} \rrangle =
+        \frac{1}{\sqrt{2}} \hat{i} + \frac{1}{\sqrt{2}} \hat{j}$$
+
+        \item
+        The function decreases the most rapidly in the direction opposite to $\grad f$. Therefore, the
+        direction of maximum decrease is
+        $$\hat{u} = \llangle -\frac{1}{\sqrt{2}}, -\frac{1}{\sqrt{2}} \rrangle =
+        -\frac{1}{\sqrt{2}} \hat{i} - \frac{1}{\sqrt{2}} \hat{j}$$
+
+        \item
+        The direction of zero change are the directions orthogonal to $\grad f$. There are
+        $$\hat{n} = \llangle \frac{1}{\sqrt{2}}, -\frac{1}{\sqrt{2}} \rrangle =
+        \frac{1}{\sqrt{2}} \hat{i} -\frac{1}{\sqrt{2}} \hat{j} \text{ and }
+        -\hat{n} = \llangle - \frac{1}{\sqrt{2}}, \frac{1}{\sqrt{2}} \rrangle =
+        -\frac{1}{\sqrt{2}} \hat{i} + \frac{1}{\sqrt{2}} \hat{j}$$
+    \end{enumerate}
+\end{example}
+
+
+\subsection{Properties of the Gradient}
+The following algebraic rules are obeyed by gradients. The rules are similar to the algebra derivatives (notice the
+difference in the \textbf{Quotient Rule}):
+
+\begin{enumerate}
+    \item \textbf{Scaling Rule:} $\grad (kf) = k \grad f$
+    \item \textbf{Sum/Difference Rule:} $\grad (f \pm g) = \grad f \pm \grad g$
+    \item \textbf{Product Rule:} $\grad (fg) = f \grad g + g \grad f$
+    \item \textbf{Quotient Rule:} $\grad \left( \frac{f}{g} \right) = \frac{g\grad f - f\grad g}{g^2}$
+\end{enumerate}
