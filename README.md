@@ -4,6 +4,6 @@
 
 This repository contains some documents that were created to learn the basics of LaTeX. Currently, it hosts three different *projects*:
 
-- My first ever LaTeX document
-- Some Linear Algebra exams recreated
-- Some class notes for Multivariate Calculus
+- Some exams recreated from the original PDFs of the course Linear Algebra
+- Some class notes for the course Multivariate Calculus
+- Theory Assignments for the course Algorithms under Uncertainty
