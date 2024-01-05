@@ -9,6 +9,6 @@
 - enable students to identify the truthness of statements involving [Vector Spaces](https://en.wikipedia.org/wiki/Vector_space) and [Linear Maps](https://en.wikipedia.org/wiki/Linear_map)
 - encourage students to construct proofs for statements using the results covered in the course
 
-## About the Programming Assignment
+## About the Proofs Assignment
 
-Students were asked to prove or disprove whether a given subset of *Z-mod 2* is a subspace or not. The aim of the assignment was to allow students to apply the concepts of subspaces programmatically.
+Students were asked to choose a problem from the book Linear Algebra Done Right, 3rd Edition by Sheldon Axler and write a proof for it.
