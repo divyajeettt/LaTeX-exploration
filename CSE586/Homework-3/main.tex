@@ -1,0 +1,339 @@
+\documentclass[11pt]{article}
+
+%\usepackage{fullpage}
+\usepackage[margin=1in]{geometry}
+\usepackage{epsfig, hyperref}
+%\usepackage{mathptmx}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{times}
+\usepackage{tabularx}
+\usepackage{amsmath, amsthm, amssymb}
+\usepackage{tikz}
+\newtheorem{theorem}{Theorem}
+\newtheorem{claim}{Claim}
+\newtheorem{corollary}{Corollary}[claim]
+\newcommand{\eat}[1]{}
+
+\newcommand{\cI}{{\cal I}}
+\newcommand{\cA}{{\cal A}}
+\newcommand{\cB}{{\cal B}}
+\newcommand{\bigO}{{\cal O}}
+\newcommand{\opt}{{\mathsf{opt}}}
+\usepackage{color}
+\newcommand{\alert}[1]{\textcolor{red}{#1}}
+\newcommand{\poly}{{\rm poly}}
+\newcommand{\cR}{{\mathsf{CR}}}
+\newcommand{\mk}{{\textsc{MARKING }}}
+\newcommand{\expt}[1]{{\mathbb E[#1]}}
+\newcommand{\prob}[1]{{\mathbb P[#1]}}
+
+\title{
+    \textbf{CSE586: Algorithms Under Uncertainty} \\
+    Homework 3 Solutions % \\
+    % Team Member 1: \href{mailto:ashlesha21380@iiitd.ac.in}{Ashlesha Gupta (2021380)} \\
+    % Team Member 2: \href{mailto:divyajeet21529@iiitd.ac.in}{Divyajeet Singh (2021529)}
+}
+\author{
+    \href{mailto:ashlesha21380@iiitd.ac.in}{Ashlesha Gupta (2021380)} \and
+    \href{mailto:divyajeet21529@iiitd.ac.in}{Divyajeet Singh (2021529)}
+}
+\date{}
+
+\begin{document}
+\maketitle
+
+\section*{Solution 1.}
+
+\subsection*{Part (a)}
+We are required to prove that the offline optimal algorithm, $\mathbf{OPT}$,
+can match all arriving vertices $v_{i} \in R$ to some unique vertex $u(v_{i}) \in L$.
+\begin{claim}
+    $\mathbf{OPT}$ knows the sequence of vertices $\langle w_{i} \rangle$ that
+    are removed in each step.
+\end{claim}
+\begin{proof}
+    $\mathbf{OPT}$ has complete knowledge of the input sequence $\sigma$
+    of vertices $v_{1}$, $v_{2}$, $\ldots$, $v_{n}$ arriving in the online
+    algorithm. This means that $\mathbf{OPT}$ knows the set of vertices $S_{i}$
+    that  are adjacent to each vertex $v_{i}$ in $\sigma$. So, given that
+    $v_{i}$ is connected to all vertices in $S_{i}$, $\mathbf{OPT}$ can infer
+    the sequence of vertices $\langle w_{i} \rangle$ that are removed in each
+    step by using the set difference between $S_{i}$ and $S_{i+1}$.
+\end{proof}
+An optimal algorithm is one that can match the maximum number of vertices
+in $R$ to vertices in $L$. To maximize the number of matches, $\mathbf{OPT}$
+can match each arriving vertex $v_{i} \in R$ to the vertex $w_{i} \in S_{i+1} \setminus S_{i}$,
+i.e. we define $u(v_{i}) \triangleq w_{i} \ \forall \ v_{i} \in R$. This ensures that in each step, only unmatched vetices remain in the set $S_{i+1}$,
+and hence, each arriving vertex can be matched.
+
+\subsection*{Part (b)}
+Let $W_{i}$ be the event that any deterministic online algorithm $\mathcal{A}$
+matches the vertex $w_{i}$. We must prove that
+\begin{equation}
+    \mathbb{P}[W_{i}] \leq \frac{1}{n} + \frac{1}{n-1} + \cdots + \frac{1}{n-i+1} = \sum_{j=1}^{i} \frac{1}{n-j+1}
+\end{equation}
+To prove this, we simply provide an upper bound of $\frac{1}{n-j+1}$ on the probability of $W_{i}^{(j)}$, the event that
+vertex $w_{i}$ gets matched by any deterministic online algorithm $\mathcal{A}$ in the
+$j^{th}$ step $(j \leq i)$. Certainly, $w_{i}$ cannot be matched in any step $j > i$ since
+it is removed from the set $S_{i}$ after the $i^{th}$ step. \\
+Let $\langle m_{i} \rangle_{[1:n(\mathcal{A})]}$ to denote the sequence of vertices matched by $\mathcal{A}$.
+\begin{claim}
+    \label{claim:valid}
+    At any step $j$, there are an equal number of sequences $\langle m_{k} \rangle_{[1:j]}$ such that
+    $m_{j} = w_{l}$, i.e. that end in any vertex $w_{l}$, where $j \leq l \leq n$.
+\end{claim}
+\begin{proof}
+    The claim would be trivial if all sequences of vertices were \textit{valid}. However, since after
+    each step, a certain vertex becomes unavailable. We prove that an equal number of \textit{valid}
+    sequences end in any vertex $w_{l}$, where $j \leq l \leq n$. \\
+    For every sequence $\langle m_{k} \rangle_{[1:j]}$ that ends in vertex $w_{j}$, we can construct
+    a corresponding sequence $\langle m_{k}' \rangle_{[1:j]}$ that ends in vertex $w_{l}$, where
+    $j < l \leq n$, as follows ($\circ$ denotes concatenation)
+    \begin{equation}
+        \langle m_{k}' \rangle_{[1:j]} = \begin{cases}
+            \langle m_{k} \rangle_{[1:j-1]} \circ w_{l} & \text{if } w_{l} \notin \langle m_{k} \rangle_{[1:j]} \\
+            \langle m_{k} \rangle_{[1:p-1]} \circ m_{j} \circ \langle m_{k} \rangle_{[p+1:j-1]} \circ m_{p} & \text{if } w_{l} = m_{p}
+        \end{cases}
+    \end{equation}
+    Simply put, replace the last vertex $m_{j}$ with $w_{l}$ if $w_{l}$ has not been matched yet, or
+    swap the last vertex with $w_{l}$ if $w_{l}$ was already matched in some round $p \leq j$. Note how the swapping in the
+    second case does not affect the \textit{validity} of the resulting sequence, i.e. the sequence
+    $\langle m_{k}' \rangle_{[1:j]}$ is still \textit{valid}, since $w_{l}$ (emphasizing
+    $j < l \leq n$) would still be available for matching in the $j^{th}$ step if $w_{l} \notin \langle m_{k} \rangle_{[1:j]}$.
+    Moreover, if the vertex $m_{j} = w_{j}$ (by the way we defined construction),
+    was eligible for a match in the $j^{th}$ step, then it would have been eligible for matching
+    in the previous steps as well. \\
+    In fact, the above construction is reversible, in the sense that for every sequence that ends in a fixed
+    vertex $w_{l}$, where $j \leq l \leq n$, we can construct a corresponding sequence
+    that ends in some other vertex $w_{k}$, where $j \leq k \leq n$ ($k \neq l$). \\
+    This proves that an equal number of valid seqeunces end in any vertex $w_{l}$, where $j \leq l \leq n$.
+\end{proof}
+\begin{corollary}
+    $\mathbb{P} \left[ W_{i}^{(j)} \right] \leq \frac{1}{n-j+1}$ for every $j \leq i$.
+\end{corollary}
+\begin{proof}
+    The total probability that $\mathcal{A}$ matches some vertex in round $j$ is clearly at most 1.
+    Since there are at most $n-j+1$ vertices\footnote{
+        We say "at most" $n-j+1$ vertices available in round $j$ since some of the unmatched
+        vertices may have already been removed from the current set $S_{j}$ in previous rounds.
+    } at which the matching sequence can end (i.e. that can be matched),
+    and claim \ref{claim:valid} holds, the probability that $\mathcal{A}$ matches $w_{i}$ in this round is at most $\frac{1}{n-j+1}$, i.e.
+    \begin{equation}
+        \mathbb{P} \left[ W_{i}^{(j)} \right] \leq \frac{1}{n-j+1}
+    \end{equation}
+\textit{Empirically, in a round $j$, there are at most $n-j+1$ vertices available for matching. So, if
+$w_{i} \notin \langle m_{k} \rangle_{[1:j]}$, then $w_{i}$ is available for matching in the $j^{th}$ step.
+Hence, the probability that it gets picked in this round is at most $\frac{1}{n-j+1}$.}
+\end{proof}
+$w_{i}$ can be matched in any round $j \leq i$. So, the total probability that $w_{i}$ ends up being matched
+by $\mathcal{A}$ is
+\begin{equation}
+    \mathbb{P} \left[ W_{i} \right] = \sum_{j=1}^{i} \mathbb{P} \left[ W_{i}^{(j)} \right] \leq \sum_{j=1}^{i} \frac{1}{n-j+1} = \frac{1}{n} + \frac{1}{n-1} + \cdots + \frac{1}{n-i+1}
+\end{equation}
+
+\subsection*{Part (c)}
+We must prove that there does not exist any online algorithm $\mathcal{A}$ that whose
+competitive ratio is greater than $\left( 1 - \frac{1}{e} \right)$. This can be proved by Yao's
+principle, i.e. we prove that
+\begin{equation}
+    1 - \frac{1}{e} \leq \frac{\mathbb{E}_{\sigma \in D_{I}} [\mathbf{\Lambda}^{\star}(\sigma)]}{\mathbb{E}_{\sigma \in D_{I}}[\mathbf{OPT}(\sigma)]}
+\end{equation}
+Hence, we must find a suitable distribution on the input sequences. The instance will consist of
+$n$ vertices, where $n$ is a large number. At any round, we send a request to match
+any vertex $v_{i}$ which has connections to $u_{i}, u_{i+1}, \ldots, u_{n} \in L$, uniformly at random.
+
+\section*{Solution 2.}
+This problem is an extension of the full-feedback $n$-experts problem covered in class.
+We are given an expression for the total loss. However, since our algorithm is randomized,
+we must consider the expected loss. This means that the regret is given by
+\begin{equation}
+    \label{eq:rand-regret}
+    \textsc{Regret}(T) \leq \mathbb{E}\left[ \sum_{t=1}^{T} l_{E_{t}}^{t} + \sum_{t=1}^{T-1} \mathbb{I}_{\{E_{t} = E_{t+1}\}} \right] - \min_{1 \leq i \leq n} \sum_{t=1}^{T} l_{i}^{(t)}
+\end{equation}
+where the expectation is over the randomization of the algorithm, i.e. the experts $E_{t}$
+chosen in each round $t = 1, 2, \ldots, T$.
+
+\subsubsection*{The proposed randomized algorithm}
+We propose the randomized algorithm $\mathbf{\Lambda}$ given in Algorithm \ref{alg:mwa}, which is
+a modification of the Multiplicative Weights Algorithm (MWA). We need to (in expectation)
+minimize the number of expert switches, and so, the algorithm chooses to stick to the
+same expert with some probability.
+\begin{algorithm}
+    \caption{Modified MWA algorithm for $n$-experts with a cost for switching experts}
+    \label{alg:mwa}
+    \begin{algorithmic}[1]
+        \Procedure{Experts-problem}{$\sigma[1:T]$, $n$, $\eta$}:
+            \State $w_{i}^{(1)} \gets 1 \quad 1 \leq i \leq n$
+            \State $W^{(1)} \gets \sum_{i=1}^{n} w_{i}^{(1)}$
+            \State Sample $e_{1}$ from the distribution $\mathcal{P}^{(1)}$ given by $p_{i}^{(1)} = \frac{w_{i}^{(1)}}{W^{(1)}} \quad 1 \leq i \leq n$
+            \For{$t \gets 2$ to $T$}
+                \State $w_{i}^{(t)} \gets w_{i}^{(t-1)} (1 - \eta)^{l_{i}^{(t)}} \quad 1 \leq i \leq n$
+                \State $W^{(t)} \gets \sum_{i=1}^{n} w_{i}^{(t)}$
+                \State $e_{t} \gets \begin{cases}
+                    e_{t-1} & \text{with probability } (1 - \eta)^{l_{e_{t-1}}^{(t)}} \\
+                    \text{Choose expert } i \text{ with probability distribution } \mathcal{P}^{(t)} & \text{otherwise}
+                \end{cases}$
+            \EndFor
+        \EndProcedure
+    \end{algorithmic}
+\end{algorithm}
+\vspace*{0pt} \\
+The intuition behind this algorithm is that it tries to minimize the number of switches
+by sticking to the same expert $e_{t}$ with probability $(1 - \eta)^{l_{e_{t}}^{t}}$, which is
+the weight update for the expert $e_{t}$ in round $t$. We expect the best expert
+to have the lowest loss, and so, we expect the algorithm to stick to the best expert
+with a higher probability. \\
+This helps the algorithm into phases where the algorithm sticks to the same expert.
+
+\subsubsection*{Regret Analysis}
+We prove that $\mathbf{\Lambda}$ has sublinear regret. For this, we make the following claim. By equation \eqref{eq:rand-regret},
+we need to bound the expected number of switches in the algorithm. Let the random variable $S_{t}$ denote the number of switches
+in the first $t$ rounds. Now, we have
+\begin{align}
+    \mathbb{E}\left[ \sum_{t=1}^{T} l_{E_{t}}^{t} + \sum_{t=1}^{T-1} \mathbb{I}_{\{E_{t} = E_{t+1}\}} \right] &= \sum_{t=1}^{T} \mathbb{E}\left[ l_{E_{t}}^{t} \right] + \sum_{t=1}^{T-1} \mathbb{E}\left[ \mathbb{I}_{\{E_{t} = E_{t+1}\}} \right] \\
+    &= L_{\mathbf{\Lambda}}^{(T)} + \mathbb{E}\left[ S_{T} \right]
+\end{align}
+where $L_{\mathbf{\Lambda}}^{(T)}$ is the expected loss of $\mathbf{\Lambda}$ in $T$ rounds.
+
+\begin{claim}
+    \label{claim:prob}
+    The probability that $\mathbf{\Lambda}$ chooses expert $i$ in round $t$ is equal to the probability with
+    which MWA selects it in the full-feedback $n$-experts problem, i.e.
+    \begin{equation}
+        \mathbb{P}[e_{t} = i] = \frac{w^{(i)}}{W^{(t)}} \quad 1 \leq i \leq n, 1 \leq t \leq T
+    \end{equation}
+\end{claim}
+\begin{proof}
+    In any round $t \geq 2$, $\mathbf{\Lambda}$ chooses expert $i$ either because it was
+    chosen in round $t-1$, or because it was sampled from the distribution $\mathcal{P}^{(t)}$ again
+    when we are not sticking.
+    This gives
+    \begin{align}
+        \mathbb{P}[e_{t} = i] &= \mathbb{P}[e_{t-1} = i] \cdot (1 - \eta)^{l_{i}^{(t)}} + \mathbb{P}[e_{t-1} \neq i] \cdot \frac{w_{i}^{(t)}}{W^{(t)}}
+    \end{align}
+    Since this is a recursive claim, we use induction to prove it. Clearly, the claim holds for $t = 1$, since we
+    select $e_{1}$ from the distribution $\mathcal{P}^{(1)}$.
+    Assuming the claim holds for $t-1$, we have (following from the previous equation)
+    \begin{align}
+        \mathbb{P}[e_{t} = i] &= \frac{w_{i}^{(t-1)}}{W^{(t-1)}} \cdot (1 - \eta)^{l_{i}^{(t)}} + \left(1 - \frac{w_{i}^{(t-1)}}{W^{(t-1)}} \cdot (1 - \eta)^{l_{i}^{(t)}} \right) \cdot \frac{w_{i}^{(t)}}{W^{(t)}} \\
+        &= \frac{w_{i}^{(t-1)}}{W^{(t-1)}} \cdot (1 - \eta)^{l_{i}^{(t)}} + \left(1 - \frac{w_{i}^{(t)}}{W^{(t-1)}} \right) \cdot \frac{w_{i}^{(t)}}{W^{(t)}} \\
+        &= \frac{w_{i}^{(t)}}{W^{(t-1)}} + \frac{w_{i}^{(t)}}{W^{(t)}} - \frac{w_{i}^{(t)}}{W^{(t-1)}} = \frac{w_{i}^{(t)}}{W^{(t)}}
+    \end{align}
+    Hence, the claim is proved.
+\end{proof}
+We now provide a bound on the expected number of switches in the algorithm. There can be only as many switches in the algorithm as many
+times the algorithm chooses to sample from the distribution $\mathcal{P}^{(t)}$. So, the probability
+of sampling again in any step $t \geq 2$ is
+\begin{align}
+    \mathbb{P}[\text{Switching experts at step } t] &= \sum_{j=1}^{n} \mathbb{P}\left[ e_{t-1} = j \right] \cdot \prob{\text{Switching from expert } j} \\
+    &= \sum_{j=1}^{n} \mathbb{P}\left[ e_{t-1} = j \right] \cdot \left( 1 - (1 - \eta)^{l_{j}^{(t-1)}} \right) \\
+    &= 1 - \sum_{j=1}^{n} \frac{w_{j}}{W^{(t-1)}} \cdot (1 - \eta)^{l_{j}^{(t-1)}} \\
+    &= \frac{W^{(t-1)} - W^{(t)}}{W^{(t-1)}} = s_{t} \quad (\text{say})
+\end{align}
+From this, we have a bound on the sum of weights at the end of round $t$.
+\begin{align}
+    W^{(t)} &= (1 - s_{t}^{t}) W^{(t-1)} \\
+    \implies W^{(T)} &= W^{(1)} \prod_{t=1}^{T-1} (1 - s_{t}^{t}) = n \prod_{t=1}^{T-1} (1 - s_{t}^{t}) \\
+    &\geq (1 - \eta)^{\sum_{i=1}^{T-1}l_{i}^{t}}
+\end{align}
+where the last inequality follows from the lecture. Taking natural log on both sides gives
+\begin{align}
+    \ln{n} + \sum_{t=1}^{T-1} \ln{(1 - s_{t}^{t})} &\geq \sum_{t=1}^{T} \ln{(1 - \eta)}
+\end{align}
+Claim \ref{claim:prob} implies that the expected loss of $\mathbf{\Lambda}$ without counting the cost of
+switching the experts is the same as that of MWA in the full-feedback $n$-experts problem. So, we have
+\begin{align}
+    \textsc{Regret}(T) &\leq L_{\mathbf{\mathbf{MWA}}}^{(T)} + \mathbb{E}\left[ S_{T} \right] - \min_{1 \leq i \leq n} \sum_{t=1}^{T} l_{i}^{t} \\
+    \label{eq:mwa-bound}
+    &\leq \min_{1 \leq i \leq n} \sum_{t=1}^{T} l_{i}^{(t)} + 2 \sqrt{T \ln{n}} + \frac{W^{(t-1)} - W^{(t)}}{W^{(t-1)}} - \min_{1 \leq i \leq n} \sum_{t=1}^{T} l_{i}^{t} \\
+    &\leq 2 \sqrt{T \ln{n}} + \frac{W^{(t-1)} - W^{(t)}}{W^{(t-1)}}
+\end{align}
+where equation \eqref{eq:mwa-bound} follows from the lecture. So, we finally have (by the above inequalities)
+\begin{align}
+\end{align}
+
+\section*{Solution 3.}
+By \textbf{Theorem 24.5} in [2], if the loss function $f_{t}(\mathbf{w})$ is convex, and the
+regularizer $R(\mathbf{w})$ is $\sigma$-strongly convex and follows the Lipschitz conditions
+with parameter $L$, then the regret of FTRL is bounded by
+\begin{equation}
+    \label{eq:regret}
+    \textsc{Regret}(T) \leq \max_{\mathbf{u} \in S} R(\mathbf{u}) - R \left( \mathbf{w}^{(1)} \right) + T \cdot \frac{L^{2}}{\sigma}
+\end{equation}
+To provide a bound on the regret of FTRL on the given online linear regression problem with
+Euclidean regularizer, we solve for the right-hand side of the inequality in \eqref{eq:regret}. \\
+We know (courtsey of lecture) that the Euclidean regularizer is $\frac{1}{\eta}$-strongly convex. So, we already have the
+value for $\sigma$.
+\begin{equation}
+    R(\mathbf{w}) = \frac{1}{2\eta} \sum_{i=1}^{2} w_{i}^{2} = \frac{1}{2 \eta} \left\lVert \mathbf{w} \right\rVert_{2}^{2}
+\end{equation}
+Clearly, the maximum value of $R(\mathbf{w})$ is achieved when $\lVert \mathbf{w} \rVert_{2} = r$,
+since $\mathbf{w} \in S$. So, we have
+\begin{align}
+    \max_{\mathbf{u} \in S} R(\mathbf{u}) = \max_{\mathbf{u} \in S} \frac{1}{2\eta} \left\lVert \mathbf{u} \right\rVert_{2}^{2} = \frac{1}{2\eta} r^{2}
+\end{align}
+Moreover, $R\left(\mathbf{w}^{(1)}\right) \geq 0$, so we can simply ignore it in the bound (equivalently,
+we take its minimizer, which is 0). Hence, we have
+\begin{equation}
+    \label{eq:regret-bound}
+    \textsc{Regret}(T) \leq \frac{1}{2\eta} r^{2} + T \eta L^{2}
+\end{equation}
+Now, we find a value for the parameter $L$ for which the loss function $f_{t}(\mathbf{w})$ satisfies
+the Lipschitz condition. We use the $\mathcal{L}_{2}$-norm for the right-hand size of the Lipschitz inequality.
+\begin{align}
+    \label{eq:lipschitz}
+    | f_{t}(\mathbf{u}) - f_{t}(\mathbf{v}) | &\leq L \left\lVert \mathbf{u} - \mathbf{v} \right\rVert_{2} \\
+    \left| \left( u_{1} x^{(t)} + u_{2} - y^{(t)} \right)^{2} - \left( v_{1} x^{(t)} + v_{2} - y^{(t)} \right)^{2} \right| &\leq L \sqrt{(u_{1} - v_{1})^{2} + (u_{2} - v_{2})^{2}} \\
+    &\leq L \cdot 2r \quad \text{since } \max_{\mathbf{u}, \mathbf{v} \in S} \lVert \mathbf{u} - \mathbf{v} \rVert_{2} = 2r
+\end{align}
+We find a value for $L$ by overestimating the left-hand side of the inequality in \eqref{eq:lipschitz}. This
+gives us a slightly loose bound on $L$, but it is still valid. For notational convenience, we define
+$\mathbf{w}^{T} x^{(t)}\triangleq w_{1} x^{(t)} + w_{2}$.
+\begin{align}
+    | f_{t}(\mathbf{u}) - f_{t}(\mathbf{v}) | &= \left| \left( \mathbf{u}^{T} x^{(t)} - y^{(t)} \right)^{2} - \left( \mathbf{v}^{T} x^{(t)} - y^{(t)} \right)^{2} \right| \\
+    &= \left| \left( \mathbf{u}^{T} x^{(t)} \right)^{2} + \left( y^{(t)} \right)^{2} + 2 y^{(t)} \mathbf{u}^{T} x^{(t)}
+            - \left( \mathbf{v}^{T} x^{(t)} \right)^{2} - \left( y^{(t)} \right)^{2} - 2 y^{(t)} \mathbf{v}^{T} x^{(t)} \right| \\
+    &= \left| \left( \mathbf{u}^{T} x^{(t)} \right)^{2} - \left( \mathbf{v}^{T} x^{(t)} \right)^{2} + 2 y^{(t)} (\mathbf{u} - \mathbf{v})^{T} x^{(t)} \right| \\
+    &\leq \left| \left( \mathbf{u}^{T} x^{(t)} \right)^{2} - \left( \mathbf{v}^{T} x^{(t)} \right)^{2} \right| + 2 \left| (\mathbf{u} - \mathbf{v})^{T} x^{(t)} \right| \\
+    &\leq \left| \left( \mathbf{u}^{T} x^{(t)} \right)^{2} - \left( \mathbf{v}^{T} x^{(t)} \right)^{2} \right| + 2 \lVert \mathbf{u} - \mathbf{v} \rVert_{2} \left| x^{(t)} \right| \\
+    &\leq \left( \mathbf{u}^{T} x^{(t)} \right)^{2} + \left( \mathbf{v}^{T} x^{(t)} \right)^{2} + 2 \cdot 2r
+    \leq \left( \mathbf{u}^{T} x^{(t)} \right)^{2} + 2 \cdot 2r = 2r^{2} + 4r
+\end{align}
+So, solving the inequality
+\begin{align}
+    2r^{2} + 4r \leq L \cdot 2r \implies L \geq r + 2
+\end{align}
+So, we have, by \eqref{eq:regret-bound}
+\begin{equation}
+    \textsc{Regret}(T) \leq \frac{1}{2\eta} r^{2} + T \eta \left( r + 2 \right)^{2}
+\end{equation}
+We choose a suitable value of $\eta = \frac{1}{\sqrt{2T}}$ to minimize the regret bound. Then,
+\begin{align}
+    \textsc{Regret}(T) &\leq \frac{r^{2}}{2} \sqrt{2T} + \frac{T}{\sqrt{2T}} \left( r + 2 \right)^{2} \\
+    &= \frac{r^{2}}{2} \sqrt{2T} + \frac{r^{2}}{2} \sqrt{2T} + 2r \sqrt{2T} + 2 \sqrt{2T} \\
+    &= \sqrt{2T} \left( r^{2} + 2r + 2 \right) \\
+    &\leq \sqrt{2T} \left( r + \sqrt{2} \right)^{2} = \bigO \left( \sqrt{T} \right)
+\end{align}
+
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% If we bound a little differently,
+% \begin{align}
+%     | f_{t}(\mathbf{u}) - f_{t}(\mathbf{v}) | &= \left| \left( \mathbf{u}^{T} x^{(t)} - y^{(t)} \right)^{2} - \left( \mathbf{v}^{T} x^{(t)} - y^{(t)} \right)^{2} \right| \\
+%     &= \left| \left( \mathbf{u}^{T} x^{(t)} \right)^{2} - \left( \mathbf{v}^{T} x^{(t)} \right)^{2} - 2 y^{(t)} (\mathbf{u} - \mathbf{v})^{T} x^{(t)} + 2 (u_{1} u_{2} - v_{1} v_{2}) \right|
+% \end{align}
+% Let's say $y^{(t)} = -1$, since it maximizes the above expression. Then, any decrease in $\mathbf{v}$ to make
+% $\mathbf{u} - \mathbf{v}$ larger also decreases the term $-(\mathbf{v}^{T} x^{(t)})^{2}$. The rest of the terms
+% are maximized at
+
+\section*{References}
+\begin{enumerate}
+    \item \href{https://people.cs.umass.edu/~akshay/courses/cs690m/files/lec15.pdf}{Lecture on Online Learning and Online Convex Optimization (2017, Dr. Akshay Krishnamurthy)}
+    \item \href{https://tcs.cs.uni-bonn.de/lib/exe/fetch.php?media=teaching%3Ass21%3Avl-aau%3Alecture24.pdf&authuser=0}{Lecture on Online Convex Optimization (Summer 2021, Dr. Thomas Kesselheim)}
+    \item \href{https://math.stackexchange.com/questions/3663333/upper-bound-on-scalar-product}{Upper bound on Scalar Product (Math Stack Exchange)}
+    \item \href{https://tcs.cs.uni-bonn.de/lib/exe/fetch.php?media=teaching%3Ass21%3Avl-aau%3Alecture19.pdf}{Lecture on No Regret Learning (Monsoon 2023, Dr. Syamantak Das)}
+    \item \href{https://proceedings.mlr.press/v98/daniely19a/daniely19a.pdf}{Competitive Ratio vs Regret Minimization}
+\end{enumerate}
+
+\end{document}
