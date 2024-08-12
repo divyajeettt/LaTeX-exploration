@@ -1,0 +1,415 @@
+\documentclass[9pt]{article}
+
+%\usepackage{fullpage}
+\usepackage[margin=2cm]{geometry}
+\usepackage{hyperref}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{amsmath, amsthm, amssymb}
+\usepackage{tikz}
+\usepackage{multicol}
+\newtheorem{theorem}{Theorem}
+\newtheorem{claim}{Claim}
+
+\title{
+    \textbf{CSE523: Randomized Algorithms} \\
+    \textbf{\large{Assignment 1 Solutions}} % \\
+}
+\author{
+    \href{mailto:divyajeet21529@iiitd.ac.in}{Divyajeet Singh (2021529)}
+}
+\date{}
+
+\begin{document}
+\maketitle
+
+\section*{\textbf{Solution 1.}}
+Let $N$ be the number of people who receive the card meant for them. Let $X_{i}$ be a Bernoulli
+random variable governing that the $i^{th}$ person receives the card meant for them, i.e.
+\begin{equation}
+    \label{X-i}
+    X_{i} = \begin{cases}
+        1 & \text{the } i^{th} \text{ person receives the } i^{th} \text{ card} \\
+        0 & \text{otherwise}
+    \end{cases}
+\end{equation}
+Note that $X_{i}$ is 1 irrespective of the positions of other cards. We are interested in finding
+the expectation of $N$, i.e. $\mathbb{E}[N]$. We see that the random variable $N$ can be written as
+\begin{align}
+    \label{N}
+    N &= X_{1} + X_{2} + \cdots + X_{n} = \sum_{i=1}^{n} X_{i} \\
+    \label{exp-N}
+    \implies \mathbb{E}[N] = \sum_{i=1}^{n} \mathbb{E}[X_{i}] &= \sum_{i=1}^{n} \mathbb{P}[X_{i} = 1]
+    \qquad \text{by linearity of expectation}
+\end{align}
+We find the probability that the $i^{th}$ person recieves the correct card. Out of the $n!$
+total permutations, if we fix one card at its correct envelope, the remaining cards can be
+arranged in exactly $(n-1)!$ ways (keeping the correctly placed $i^{th}$ card fixed).
+\begin{equation}
+    \label{prob-X-i}
+    \mathbb{P}[X_{i} = 1] = \frac{(n-1)!}{n!} = \frac{(n-1)!}{n \cdot (n-1)!} = \frac{1}{n}
+\end{equation}
+So, each $X_{i} \sim \textsc{Bernoulli}\left(\frac{1}{n}\right)$. Hence, by \eqref{exp-N} and \eqref{prob-X-i}, we get
+\begin{equation}
+    \label{exp-N-sol}
+    \mathbb{E}[N] = \sum_{i=1}^{n} \mathbb{P}[X_{i} = 1] = \sum_{i=1}^{n} \frac{1}{n}
+    = \frac{1}{n} \cdot n = 1
+\end{equation}
+Hence, in expectation, 1 person receives the card meant for them. Section 1 in the Appendix expands
+on the intuition behind the solution.
+
+\section*{\textbf{Solution 2.}}
+We are now interested in the probability\footnote{Notice how $N \nsim \textsc{Binomial}(n, \mathbb{P}[X_{i} = 1])$
+since it is a sum of $n$ dependent Bernoulli random variables.} $\mathbb{P}[N = r]$. For this, just
+like above, we fix any $r$ cards. We want only and exactly these cards to go in their correct envelopes.
+Once these $r$ cards are fixed, out of the $n!$ permutations, the remaining cards can be arranged
+in exactly $(n-r)!$ ways (keeping the correctly placed $r$ cards fixed). Let us denote the indices of
+fixed cards by $p_{1}, p_{2}, \dots, p_{r}$. Then\footnote{\textbf{Abuse of notation:} I use the random
+variables $X_{i}$ and the event that the $i^{th}$ card is placed in the correct envelope interchangeably.
+So, the union of $X_{1}$ to $X_{n}$ represents the the event $(X_{1} = 1) \cup (X_{2} = 1) \cup \dots \cup (X_{n} = 1)$.
+The same goes for intersections.}, the total probability that these cards are in their correct envelopes is
+\begin{equation}
+    \label{prob-X-R}
+    \mathbb{P}\left[ \bigcap_{i = 1}^{r} X_{p_{i}} \right] = \frac{(n-r)!}{n!}
+\end{equation}
+However, we want to now rule out the permutations where any \textit{other} cards appear on their correct position.
+Let us denote the indices of the non-fixed cards by $q_{1}, q_{2}, \dots, q_{m}$ (where $m = n-r$).
+We first find the probability that (among the non-fixed cards) at least 1 card is in its correct envelope.
+This can be found using the Inclusion-Exclusion principle.
+\begin{equation}
+    \label{incl-excl}
+    \mathbb{P}\left[ \bigcup_{i=1}^{m} X_{q_{i}} \right] = \sum_{i=1}^{m} \mathbb{P}[X_{q_{i}}] - \sum_{1 \leq i < j \leq m}
+    \mathbb{P}[X_{q_{i}} \cap X_{q_{j}}] + \sum_{1 \leq i < j < k \leq m} \mathbb{P}[X_{q_{i}} \cap X_{q_{j}} \cap X_{q_{k}}] - \cdots
+    + (-1)^{m} \mathbb{P}\left[ \bigcap_{i=1}^{m} X_{q_{i}} \right]
+\end{equation}
+The terms in this large sum can be easily found by substituting different values for $r$ in \eqref{prob-X-R} and
+multiplying by the size of the summation. It is interesting that the probability in \eqref{prob-X-R} is irrespective of
+the choice of the $r$ cards. So, the $j^{th}$ term of the summation is simply the product of the number of ways to choose
+$j$ out of $m$ cards and the corresponding probability that the $j$ chosen cards are in their correct envelopes. \\
+Out of $m = n-r$, $j$ cards can be selected in exactly ${{m}\choose{j}}$ ways. Hence, we get
+\begin{equation}
+    \label{at-least-1}
+    \begin{split}
+        \mathbb{P}\left[ \bigcup_{i=1}^{m} X_{q_{i}} \right] &= {{m}\choose{1}} \frac{(m-1)!}{m!} - {{m}\choose{2}} \frac{(m-2)!}{m!} + \cdots + (-1)^{m} {{m}\choose{m}} \frac{(m-m)!}{m!} \\
+        &= \frac{m!}{1! \cdot (m-1)!} \cdot \frac{(m-1)!}{m!} - \frac{m!}{2! \cdot (m-2)!} \cdot \frac{(m-2)!}{m!} + \cdots + (-1)^{m} \frac{m!}{m! \cdot (m-m)!} \cdot \frac{(m-m)!}{m!} \\
+        &= \sum_{i=1}^{m} \frac{(-1)^{i+1}}{i!}
+    \end{split}
+\end{equation}
+We are interested to find the probability that none of the non-fixed cards land on their correct positions. This can be
+found using \eqref{at-least-1}
+\begin{equation}
+    1 - \mathbb{P}\left[ \bigcup_{i=1}^{m} X_{q_{i}} \right] = 1 - \sum_{i=1}^{m} \frac{(-1)^{i+1}}{i!} = \frac{(-1)^{0}}{0!} + \sum_{i=1}^{m} \frac{(-1)^{i}}{i!} = \sum_{i=0}^{n-r} \frac{(-1)^{i}}{i!}
+\end{equation}
+Finally, we find the probability that exactly $r$ cards are in their correct envelopes
+\begin{equation}
+    \label{N-equals-r}
+    \begin{split}
+        \mathbb{P}[N = r] &= {{n}\choose{r}} \ \mathbb{P}\left[ \bigcap_{i=1}^{r} X_{p_{i}} \ \cap \ \overline{\bigcup_{i=1}^{n-r} X_{q_{i}}} \ \right] \\
+        &= {{n}\choose{r}} \ \mathbb{P}\left[ \bigcap_{i=1}^{r} X_{p_{i}} \right] \left( 1 - \mathbb{P}\left[ \bigcup_{i=1}^{n-r} X_{q_{i}} \right] \right) \\
+        &= \frac{n!}{r! \cdot (n-r)!} \cdot \frac{(n-r)!}{n!} \ \sum_{i=0}^{n-r} \frac{(-1)^{i}}{i!} = \frac{1}{r!} \sum_{i=0}^{n-r} \frac{(-1)^{i}}{i!} = \mathbf{N_{r}} \quad \text{(say)}
+    \end{split}
+\end{equation}
+Note that the above probabilities can now be multiplied because $X_{p_{i}}$s are independent of $X_{q_{i}}$s,
+since the cards indexed with $q_{i}$s can only be shuffled amongst themselves. So, we can write the probability
+distribution of $N$ as follows
+\begin{equation}
+    \label{PMF-N}
+    P_{N}(r) = \mathbb{P}[N = r] = \begin{cases}
+        \mathbf{N_{r}} & \text{if } r = 0, 1, \dots, n \\
+        0 & \text{otherwise}
+    \end{cases}
+\end{equation}
+We can verify that \eqref{N-equals-r} gives the correct answer by calculating the expectation of $N$, which is given in Section 2
+of the Appendix to this submission.
+We now find the probability that none of the cards are in the correct envelope in the limit
+as $n \to \infty$. This is simply
+\begin{equation}
+    \label{n-equals-0-n-to-infty}
+    \begin{split}
+        \lim_{n \to \infty} P_{N}(0) = \lim_{n \to \infty} \frac{1}{0!} \sum_{i=0}^{n} \frac{(-1)^{i}}{i!}
+        = \sum_{i=0}^{\infty} \frac{(-1)^{i}}{i!} = e^{-1} = \frac{1}{e}
+        \quad \text{using Taylor's expansion}
+    \end{split}
+\end{equation}
+
+\section*{\textbf{Solution 3.}}
+We present a modified version of the popular \textit{Quickselect} algorithm. The
+Quickselect algorithm is a modification of Quicksort - we recurse only to one
+side of the array where we are sure to find the $k^{th}$ smallest element\footnote{
+The worst case time complexity of quickselect is $\Theta(n^{2})$. In the classical
+setting, we assume a distribution over all possible permutations of the array and say
+that \textit{on average} (over the input distribution), quickselect runs in linear
+time.}.
+We present a randomized version of the quickselect algorithm in Algorithm (\ref{alg:rand-quickselect}), where the partitioning pivot is chosen uniformly at
+randomly from the array at each step.
+\begin{algorithm}
+    \caption{Randomized Algorithm to find the $k^{th}$ smallest element}
+    \label{alg:rand-quickselect}
+    \begin{algorithmic}[1]
+        \Procedure{Rand-Quickselect}{$A[1:n]$, $k$}:
+            \State $i \sim 1, \dots, n$ uniformly at random
+            \State $j \gets \textsc{Partition}(A[1:n], i)$
+            \If{$k < j$}
+                \State \Return \Call{Rand-Quickselect}{$A[1:j-1], k$}
+            \ElsIf{$k > j$}
+                \State \Return \Call{Rand-Quickselect}{$A[j+1:n], k-j$}
+            \Else
+                \State \Return $A[j]$
+            \EndIf
+        \EndProcedure
+    \end{algorithmic}
+\end{algorithm}
+\vspace*{0pt} \\
+Leveraging randomization, this algorithm runs in linear time in expectation.
+The partitioning algorithm, given in Algorithm (\ref{alg:partition}), is borrowed from
+Quicksort. It also returns the index at which the partition ends.
+\begin{algorithm}
+    \caption{Partitioning algorithm around a given pivot index}
+    \label{alg:partition}
+    \begin{algorithmic}[1]
+        \Procedure{Partition}{$A[1:n]$, $i$}:
+            \State $x \gets A[i]$
+            \State $j \gets 1$
+            \For{$l \gets 1$ \textbf{to} $n$}
+                \If{$A[l] \leq x$}
+                    \State \Call{Swap}{$A[j], A[l]$}
+                    \State $j \gets j + 1$
+                \EndIf
+            \EndFor
+            \State \Call{Swap}{$A[j], A[n]$}
+            \State \Return $j$
+        \EndProcedure
+    \end{algorithmic}
+\end{algorithm}
+\vspace*{0pt} \\
+When we pick a pivot in an array of size $n$, we count the number of elements
+which land to the right of the pivot. Let $R$ denote the number of such elements.
+Since we pick the pivot randomly, it is equally likely that any number of elements
+land to the right of the pivot after partitioning, each with a probability of
+$\frac{1}{n}$. So, for any $0 \leq i \leq n$,
+\begin{align}
+    \label{R}
+    \mathbb{P}[R = i] &= \frac{1}{n} \\
+    \label{exp-R}
+    \mathbb{E}[R] = \sum_{i=0}^{n} i \ \mathbb{P}[R = i] = \sum_{i=0}^{n} \frac{i}{n}
+    &= \frac{1}{n} \cdot \frac{n \cdot (n-1)}{2} = \frac{n-1}{2} \approx \frac{n}{2}
+\end{align}
+We see that in expectation, we will get (approximately) half the elements to the
+right of the pivot. Similarly, approximately half the elements land to the left
+of the pivot in expectation. So, the recurrence can be defined as
+\begin{equation}
+    \label{exp-Tn-rand-quickselect}
+    \begin{split}
+        \mathbb{E}[T(n)] &= \mathbb{E}_{k \sim 1, \dots, n}[T(k)] + cn = \mathbb{E}\left[T\left( \frac{n}{2} \right)\right] + cn \\
+        &= \mathbb{E}_{k \sim 1, \dots, \frac{n}{2}}[T(k)] + c \cdot \frac{n}{2} + cn
+        = \mathbb{E}\left[T\left( \frac{n}{4} \right)\right] + c \cdot \frac{n}{2} + cn \\
+        &\quad \vdots \\
+        &\leq c \sum_{i=0}^{\infty} \frac{n}{2^{i}} = cn \cdot \left( 1 + \frac{1}{2} + \frac{1}{4} + \cdots \right) = 2c n = O(n)
+    \end{split}
+\end{equation}
+The worst case time complexity of this algorithm is still $O(n^{2})$ since
+with at least $\frac{1}{n!}$ probability, the algorithm selects the worst pivots
+and repeatedly partitions around them (in the reversed sorted order).
+
+\section*{\textbf{Solution 4.}}
+[\textbf{Note:} Hashing has not been covered in class - this is just an attempt.] \\
+For simplicity, we assume that the arrays in consideration are permutations of $[n]$. Let us assume
+that the given \textit{sorting} algorithm is called $\textsc{Sort}(A[1:n])$. \\
+We build our solution stepwise. Algorithm (\ref{alg:gen-hash}) gives an algorithm to use the prime number
+generator to create hash functions. Let $\mathbb{W}_{<p}$ denote the set of whole numbers smaller than
+$p$, i.e. $\{ 0, 1, \dots, p-1 \}$.
+\begin{algorithm}
+    \caption{Returns a random hash function}
+    \label{alg:gen-hash}
+    \begin{algorithmic}[1]
+        \Procedure{Generate-Hash-Function}{$n$, $\epsilon$}:
+            \State $p \gets$ prime greater than $\frac{n}{\epsilon}$
+            \State $A \gets \{ x = (x_{1}, x_{2}, \dots, x_{r}) \ | \ x \ \text{is base-}p \ (x_{i} \in \mathbb{W}_{<p} \ \forall \ 1 \leq i \leq r) \}$
+            \State $a \sim A$ uniformly at random
+            \State \Return $h_{a}$ defined by $h_{a}(x) \triangleq \left( \sum_{i=1}^{r} a_{i} x_{i} \right) \bmod p$ \Comment{$h_{a}: A \to \mathbb{W}_{<p}$}
+        \EndProcedure
+    \end{algorithmic}
+\end{algorithm}
+\vspace*{0pt} \\
+Courtesy for the hash function generation algorithm to [2]. I attempted to use this to first create
+a \textit{simple} randomized algorithm $\mathcal{A}$ that checks the existence of only 1 element of $A$ in $\textsc{Sort}(A)$.
+This could have been extended to an algorithm $\mathcal{A}_{\epsilon}$ that runs $\mathcal{A}$ some
+sublinear of $n$ number of times to get the desired probability of success. However, all attempts were
+in vain. \\
+A trivial $O(n)$ algorithm can be as follows. Get a hash map $H$ of size $p$, where $p$ is a prime greater than $\frac{n}{\epsilon}$.
+Let $B \gets \textsc{Sort}(A)$. Mark every element of $A$ as $\textsc{True}$ in $H$. If we find some $b \in B$ with $H[b] = \textsc{False}$,
+we report that the output is not a permutation. However, its analysis might be complicated due to the involved hashing.
+
+\section*{\textbf{Solution 5.}}
+The given algorithm can be described by Algorithm (\ref{alg:mod-quicksort}).
+\begin{algorithm}
+    \caption{Modified Quicksort Algorithm}
+    \label{alg:mod-quicksort}
+    \begin{algorithmic}[1]
+        \Procedure{Mod-Quicksort}{$A[l:r]$}:
+            \If{$l \geq r$}
+                \State \Return
+            \EndIf
+            \While{\textsc{True}}
+                \State $i \sim l, \dots, r$ uniformly at random
+                \State $j \gets \Call{Partition}{A[l:r], i}$
+                \If{$j-l+1 \leq \frac{2}{3}(r-l+1)$ \textbf{and} $r-j+1 \leq \frac{2}{3}(r-l+1)$}
+                    \State \textbf{break}
+                \EndIf
+            \EndWhile
+            \State $\Call{Mod-Quicksort}{A[l:j-1]}$
+            \State $\Call{Mod-Quicksort}{A[j+1:r]}$
+        \EndProcedure
+    \end{algorithmic}
+\end{algorithm}
+\vspace*{0pt} \\
+To analyze the expected running time of this algorithm, we first bound the probability of
+successfully finding a \textit{good pivot}\footnote{\textbf{Definition. \textit{Good Pivot}:} A pivot
+having at most $\frac{2}{3}$ elements to either side.}. Let's find the number of good pivots
+in an array of size $n$. It is easy to see that if the sorted index $j$ of the pivot is less than
+$\frac{1}{3} n$, then more than $\frac{2}{3} n$ elements land to its right. Similarly, if $j > \frac{2}{3} n$,
+then more than $\frac{2}{3} n$ elements land to its left. So, we see that the number of good pivots
+in an array of size $n$ is given by
+\begin{equation}
+    \label{good-pivot}
+    \left( \frac{2}{3} - \frac{1}{3} \right) n = \frac{n}{3}
+\end{equation}
+Since the pivot is picked uniformly at random, the probability of picking a good pivot in one trial
+is
+\begin{equation}
+    \label{prob-good-pivot}
+    p = \frac{n}{3n} = \frac{1}{3}
+\end{equation}
+It is not hard to notice that the number of trials required for successfully picking a pivot is distributed
+as a random variable $X \sim \textsc{Geometric}(p)$ since we repeat the trials (which are independent) until a good
+pivot is found. We find the expected number of trials required to get a successful trial, i.e. find a good pivot.
+\begin{equation}
+    \label{exp-X}
+    \mathbb{E}[X] = p^{-1} = \left(\frac{1}{3} \right)^{-1} = 3
+\end{equation}
+Note that each time a pivot is picked and tested for \textit{goodness}, it takes $O(n)$ time for an array of size $n$
+since the partition is computed for that pivot. Finally, we calculate the number of elements that can land to
+the right (or left) of a good pivot. It follows from \textbf{Problem 3.} that all good pivots are equally likely (any pivot can be selected with equal probability).
+So, for any $\frac{1}{3} n \leq i \leq \frac{2}{3} n$,
+\begin{align}
+    \label{R2}
+    \mathbb{P}[R = i] &= \frac{1}{\frac{2}{3}n - \frac{1}{3}n} = \frac{3}{n} \\
+    \label{exp-R2}
+    \mathbb{E}[R] = \sum_{i=\frac{1}{3}n}^{\frac{2}{3}n} i \ \mathbb{P}[R = i] = \sum_{i=\frac{1}{3}n}^{\frac{2}{3}n} \frac{3i}{n}
+    = \frac{3}{n} \sum_{i=\frac{1}{3}n}^{\frac{2}{3}n} i &= \frac{3}{n} \left[ \frac{n}{2 \cdot 3} \left( \frac{2n}{3} + \frac{n}{3} - 1 \right) \right]
+    = \frac{n-1}{2} \approx \frac{n}{2}
+\end{align}
+Similarly, approximately $\frac{n}{2}$ elements land to the left of a good pivot. Let
+$T(n)$ denote the time taken by Algorithm (\ref{alg:mod-quicksort}) on an input of size $n$.
+The recurrence relation can be defined as follows (the second term represents the expected work done
+to find the pivot)
+\begin{equation}
+    \label{exp-Tn-mod-quicksort}
+    \begin{split}
+        \mathbb{E}[T(n)] &= 2 \mathbb{E}_{k \sim \frac{1}{3}n, \dots, \frac{2}{3}n}[T(k)] + 3cn
+        = 2 \mathbb{E}\left[T\left( \frac{n}{2} \right)\right] + 3cn \\
+        &= 2 \left( 2 \mathbb{E}_{k \sim \frac{1}{3}\cdot\frac{n}{2}, \dots, \frac{2}{3}\cdot\frac{n}{2}}[T(k)] + 3c \cdot \frac{n}{2} \right) + 3cn
+        = 2 \left( 2 \mathbb{E}\left[T\left( \frac{n}{4} \right)\right] + 3c \cdot \frac{n}{2} \right) + 3cn \\
+        &= 2 \left\{ 2 \left( 2 \mathbb{E}\left[T\left( \frac{n}{8} \right)\right] + 3c \cdot \frac{n}{4} \right) + 3c \cdot \frac{n}{2} \right\} + 3cn \\
+        &= 2^{3} \ \mathbb{E}\left[T\left( \frac{n}{2^{3}} \right)\right] + 2^{2} \cdot 3c \cdot \frac{n}{2^{2}} + 2^{1} \cdot 3c \cdot \frac{n}{2^{1}} + 2^{0} \cdot 3c \cdot \frac{n}{2^{0}} \\
+        &\quad \vdots \\
+        &\leq 2^{k} \ \mathbb{E}\left[ T\left( \frac{n}{2^{k}} \right) \right] + (k+1) \cdot 3cn
+    \end{split}
+\end{equation}
+The recurrence ends when
+\begin{equation}
+    \label{rec-end}
+    \frac{n}{2^{k}} = 1 \implies 2^{k} = n \implies k = \log_{2}{n}
+\end{equation}
+Substituting \eqref{rec-end} in \eqref{exp-Tn-mod-quicksort} gives the expected time complexity of the modified
+quicksort algorithm where we only partition around good pivots.
+\begin{equation}
+    \label{exp-Tn-mod-quicksort-sol}
+    \begin{split}
+        \mathbb{E}[T(n)] &\leq 2^{\log_{2}{n}} \mathbb{E}[T(1)] + 3cn \cdot (\log_{2}{n} + 1) \\
+        &= 3cn \log_{2}{n} + (3c + 1) \cdot n \qquad \text{assuming } T(1) = 1 \\
+        &\leq c^{2} \cdot n \log_{2}{n} \quad \forall \ n \geq 2 \\
+        \therefore \mathbb{E}[T(n)] &= O(n \log_{2}{n})
+    \end{split}
+\end{equation}
+Hence, the modified quicksort algorithm still runs in $O(n \log_{2}{n})$ poly-log time in expectation. It is
+interesting that the overall expected running time of this algorithm matches the expected running time of random
+quicksort where the pivots are chosen uniformly at random.
+
+\vfill
+\section*{References}
+\begin{enumerate}
+    \item \href{https://en.wikipedia.org/wiki/Inclusion%E2%80%93exclusion_principle}{Counting Derangements, Wikipedia}
+    \item \href{https://www.cs.princeton.edu/~wayne/kleinberg-tardos/pdf/13RandomizedAlgorithms.pdf}{Randomized Algorithms by Klienberg-Tardos, Princeton University}
+    % https://eugene-eeo.github.io/blog/randomized-quickselect.html
+\end{enumerate}
+
+\pagebreak
+
+\section*{\textbf{Appendix}}
+
+\subsection*{\textbf{Section 1}}
+One might \textit{think} that linearity of expectation in \eqref{exp-N} does not hold since $X_{i}$s are dependent -
+if a card is already placed in an envelope, no other card can go in that envelope, and no other envelope can contain this
+card. This hunch of dependence is true; however, the linearity holds regardless of independence. \\
+One might also be worried about \textit{over-counting} or \textit{double-counting} the cards, since a variable
+$X_{i}$ can be 1 in cases when some $j^{th}$ card is also correctly placed. However, even in that case, $X_{i}$ still
+equals 1 (and so, we count it as 1 card being on its correct position). The $j^{th}$ card being in the correct
+place will be accounted for by $X_{j}$, which will also be set to 1 in this case.
+Hence, we surely do not double count. \\
+We can try to get the intuition for this by taking an example, $n = 3$. Then, we get the following
+permutations of the cards in envelopes numbered 1 to 3.
+\begin{align*}
+    1 \quad 2 \quad 3 \qquad \qquad 2 \quad 1 \quad 3 \qquad \qquad 3 \quad 1 \quad 2 \\
+    1 \quad 3 \quad 2 \qquad \qquad 2 \quad 3 \quad 1 \qquad \qquad 3 \quad 2 \quad 1
+\end{align*}
+The joint distribution table for $X_{1}$, $X_{2}$, and $X_{3}$ is given below.
+\begin{align*}
+    \mathbb{P}[X_{1} = 0, X_{2} = 0, X_{3} = 0] &= \frac{2}{6} &\hfill \mathbb{P}[X_{1} = 1, X_{2} = 0, X_{3} = 0] &= \frac{1}{6} \\
+    \mathbb{P}[X_{1} = 0, X_{2} = 0, X_{3} = 1] &= \frac{1}{6} &\hfill \mathbb{P}[X_{1} = 1, X_{2} = 0, X_{3} = 1] &= 0 \\
+    \mathbb{P}[X_{1} = 0, X_{2} = 1, X_{3} = 0] &= \frac{1}{6} &\hfill \mathbb{P}[X_{1} = 1, X_{2} = 1, X_{3} = 0] &= 0 \\
+    \mathbb{P}[X_{1} = 0, X_{2} = 1, X_{3} = 1] &= 0 &\hfill \mathbb{P}[X_{1} = 1, X_{2} = 1, X_{3} = 1] &= \frac{1}{6}
+\end{align*}
+The important parts of the table are where exactly two out of the three variables are $1$. Such events have a $0$ probability,
+because once two variables are fixed, the third random variable gets fixed due to the dependence. In this case,
+the marginal PMFs of $X_{1}$ becomes
+\begin{equation*}
+    P_{X_{1}}(x_{1}) = \sum_{(x_{2}, x_{3}) \in \{ 0, 1 \}^{2} } \mathbb{P}[X_{1} = x_{1}, X_{2} = x_{2}, X_{3} = x_{3}]
+    = \begin{cases}
+        \frac{1}{6} + \frac{1}{6} = \frac{1}{3} & x_{1} = 1 \\
+        \frac{2}{3} & x_{1} = 0 \\
+        0 & \text{otherwise}
+    \end{cases}
+\end{equation*}
+Similarly, the marginals of $X_{2}$ and $X_{3}$ can be written. Now, if we find the expected number
+of correctly placed cards using the formula in \eqref{exp-N}, we get
+\begin{align*}
+    \mathbb{E}[N] = \mathbb{P}[X_{1} = 1] + \mathbb{P}[X_{2} = 1] + \mathbb{P}[X_{3} = 1] = \frac{1}{3} + \frac{1}{3} + \frac{1}{3} = 1
+\end{align*}
+The surprising fact is that this notion generalizes to $n$ dependent variables.
+
+\subsection*{\textbf{Section 2}}
+We find the expectation of $N$ using the newly found PMF, $P_{N}(r)$, given in \eqref{PMF-N}.
+\begin{align*}
+    \mathbb{E}[N] = \sum_{r=0}^{n} r \ \mathbb{P}[N = r] = \sum_{r=1}^{n} \frac{1}{(r-1)!} \sum_{i=0}^{n-r} \frac{(-1)^{i}}{i!}
+    = \sum_{r=0}^{n-1} \frac{1}{r!} \sum_{i=0}^{n-r} \frac{(-1)^{i}}{i!}
+\end{align*}
+Using the Taylor Series expansion for the exponential,
+\begin{align*}
+    e^{x} = \sum_{i=0}^{\infty} \frac{x^{i}}{i!} = 1 + x + \frac{x^{2}}{2!} + \frac{x^{3}}{3!} + \cdots
+\end{align*}
+It is not hard to notice that the first summation resembles the Taylor's expansion for
+$e^{1}$ and the second resembles the same for $e^{-1}$. So, a reasonable attempt is to assume extremely large $n$.
+\begin{align*}
+    \lim_{n \to \infty} \mathbb{E}[N] = \lim_{n \to \infty} \sum_{r=0}^{n-1} \frac{1}{r!} \sum_{i=0}^{n-r} \frac{(-1)^{i}}{i!}
+    = \sum_{r=0}^{\infty} \frac{1}{r!} \sum_{i=0}^{\infty} \frac{(-1)^{i}}{i!} = e \cdot \frac{1}{e} = 1
+\end{align*}
+For smaller $n$, let us try to use this observation.
+\begin{align*}
+    \mathbb{E}[N] &= \sum_{r=0}^{n-1} \frac{1}{r!} \sum_{i=0}^{n-r} \frac{(-1)^{i}}{i!}
+    = \sum_{r=0}^{n-1} \sum_{i=0}^{n-r} \frac{1}{r!} \cdot \frac{(-1)^{i}}{i!} \\
+    &= \sum_{r=0}^{n-1} \sum_{j=r}^{n} \frac{1}{r!} \cdot \frac{(-1)^{j-r}}{(j-r)!}  \qquad \text{change of variables } (j = r+i)
+\end{align*}
+\textit{I'm pretty sure this sum is 1; I just can't prove it (yet).}
+
+\end{document}

@@ -1,0 +1,489 @@
+\documentclass[9pt]{article}
+\usepackage[T1]{fontenc}
+%\usepackage{fullpage}
+\usepackage[margin=2cm]{geometry}
+\usepackage{hyperref}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{amsmath, amsthm, amssymb}
+\usepackage{tikz}
+\usepackage{multicol}
+\newtheorem{theorem}{Theorem}
+\newtheorem{claim}{Claim}
+
+\newcommand{\Probability}[1]{\mathbb{P}\left[ #1 \right]}
+\newcommand{\Expectation}[1]{\mathbb{E}\left[ #1 \right]}
+\newcommand{\Variance}[1]{\textsc{Var}\left[ #1 \right]}
+
+
+\title{
+    \textbf{CSE523: Randomized Algorithms} \\
+    \textbf{\large{Assignment 2 Solutions}} % \\
+}
+\author{
+    \href{mailto:divyajeet21529@iiitd.ac.in}{Divyajeet Singh (2021529)}
+}
+\date{}
+
+\begin{document}
+\maketitle
+
+\section*{\textbf{Solution 1.}}
+We are tasked with designing a modified Morris counter that increments the counter
+$X$ with probability $\frac{1}{(1 + c)^{X}}$ for some constant $c > 1$. We first
+see what our estimator $\tilde{n}$ for the count $n$ would be. The modified algorithm
+is given in Algorithm \ref{alg:modified-morris-counter}.
+\begin{algorithm}
+    \caption{Modified Morris Counter}
+    \label{alg:modified-morris-counter}
+    \begin{algorithmic}[1]
+        \State $X \gets 0$
+        \While{events occur}
+            \State $X \gets X + 1$ with probability $\frac{1}{(1 + c)^{X}}$
+        \EndWhile
+        \State \Return $\tilde{n} = \frac{(1 + c)^{X} - 1}{c}$
+    \end{algorithmic}
+\end{algorithm}
+\vspace*{0pt} \\
+Our modified estimator is $\tilde{n} = \frac{1}{c}((1 + c)^{X} - 1)$. We proceed with the analysis
+as done in class. Let $X_{n}$ denote the counter value when we have seen $n$ events.
+We compute $\Expectation{(1 + c)^{X_{n}}}$ and $\Variance{(1 + c)^{X_{n}}}$.
+
+\subsection*{\textbf{Computation of} $\Expectation{(1 + c)^{X_{n}}}$}
+Note that in any case, $\Expectation{(1 + c)^{X_{0}}} = 1$, since $X = X_{0} = 0$ when
+no events have occured. Then, for any $X_{k}$, we derive the recurrence
+\begin{align}
+    \label{eq:expectation-recurrence}
+    \begin{split}
+        \Expectation{(1 + c)^{X_{k}}}
+        &= \sum_{j = 0}^{\infty} \Probability{X_{k-1} = j} \Expectation{(1 + c)^{X_{k}} \mid X_{k-1} = j} \\
+        &= \sum_{j = 0}^{\infty} \Probability{X_{k-1} = j} \left( (1 + c)^{j}
+        \left( 1 - \frac{1}{(1 + c)^{j}} \right) + (1 + c)^{j+1} \frac{1}{(1 + c)^{j}} \right) \\
+        &= \sum_{j = 0}^{\infty} \Probability{X_{k-1} = j} \left( (1 + c)^{j} - 1 + (1 + c) \right) \\
+        &= \sum_{j = 0}^{\infty} \Probability{X_{k-1} = j} (1 + c)^{j} + c \sum_{j = 0}^{\infty} \Probability{X_{k-1} = j} \\
+        &= \Expectation{(1 + c)^{X_{k-1}}} + c
+    \end{split}
+\end{align}
+Using \eqref{eq:expectation-recurrence} and the base case, we can derive the expectation
+of the counter value when we have seen $n$ events
+\begin{align}
+    \begin{split}
+        \Expectation{(1 + c)^{X_{n}}}
+        &= \Expectation{(1 + c)^{X_{n-1}}} + c \\
+        &= \Expectation{(1 + c)^{X_{n-2}}} + 2c \\
+        &\ \vdots \\
+        &= \Expectation{(1 + c)^{X_{0}}} + nc \\
+        &= 1 + nc
+    \end{split}
+\end{align}
+
+\subsection*{\textbf{Computation of} $\Variance{(1 + c)^{X_{n}}}$}
+We derive the variance of the counter value when we have seen $n$ events. We first find the
+second moment $\Expectation{(1 + c)^{2X_{n}}}$. We proceed in a similar fashion as above.
+Note that for $X_{0} = 0$, we have $\Expectation{(1 + c)^{2X_{0}}} = 1$. Then, for any $X_{k}$,
+\begin{align}
+    \label{eq:second-moment-recurrence}
+    \begin{split}
+        \Expectation{(1 + c)^{2X_{k}}}
+        &= \sum_{j = 0}^{\infty} \Probability{X_{k-1} = j} \Expectation{(1 + c)^{2X_{k}} \mid X_{k-1} = j} \\
+        &= \sum_{j = 0}^{\infty} \Probability{X_{k-1} = j} \left( (1 + c)^{2j}
+        \left( 1 - \frac{1}{(1 + c)^{j}} \right) + (1 + c)^{2(j+1)} \frac{1}{(1 + c)^{j}} \right) \\
+        &= \sum_{j = 0}^{\infty} \Probability{X_{k-1} = j} \left( (1 + c)^{j}
+        \left( (1 + c)^{j} - 1 \right) + (1 + c)^{j + 2} \right) \\
+        &= \sum_{j = 0}^{\infty} \Probability{X_{k-1} = j} (1 + c)^{2j} + ((1 + c)^{2} - 1)
+        \sum_{j = 0}^{\infty} \Probability{X_{k-1} = j} (1 + c)^{j} \\
+        &= \Expectation{(1 + c)^{2X_{k-1}}} + c (c + 2) \Expectation{(1 + c)^{X_{k-1}}} \\
+        &= \Expectation{(1 + c)^{2X_{k-1}}} + c (c + 2) (1 + (k-1)c)
+        \quad \text{(by \eqref{eq:expectation-recurrence})}
+    \end{split}
+\end{align}
+Using \eqref{eq:second-moment-recurrence} and the base case, we can derive the second
+moment of the counter value when we have seen $n$ events
+\begin{align}
+    \begin{split}
+        \Expectation{(1 + c)^{2X_{n}}} &= \Expectation{(1 + c)^{2X_{n-1}}} + c (c + 2) (1 + (n-1)c) \\
+        &= \Expectation{(1 + c)^{2X_{n-2}}} + c (c + 2) \left[ (1 + (n-2)c) + (1 + (n-1)c) \right] \\
+        &\ \vdots \\
+        &= \Expectation{(1 + c)^{2X_{0}}} + c (c + 2) \sum_{i=0}^{n-1} (1 + ic) \\
+        &= 1 + c (c + 2) \left[ n + \frac{cn(n-1)}{2} \right]
+    \end{split}
+\end{align}
+Now that we have the expectation and second moment of the counter value, we can derive
+the variance
+\begin{align}
+    \begin{split}
+        \Variance{(1 + c)^{X_{n}}} &= \Expectation{(1 + c)^{2X_{n}}} - \Expectation{(1 + c)^{X_{n}}}^{2} \\
+        &= 1 + c (c + 2) \left[ \frac{2n + cn(n-1)}{2} \right] - (1 + nc)^{2} \\
+        &= 1 + \frac{c^{2} + 2c}{2} (2n + cn^{2} - cn) - 1 - 2nc - n^{2}c^{2} \\
+        &= c^{3} \frac{n (n - 1)}{2} \quad \text{(simplification by expansion)}
+    \end{split}
+\end{align}
+
+\subsection*{\textbf{Application of Chebyshev's Inequality}}
+Now, we can simply apply Chebyshev's inequality to get the required bound on the error
+\begin{align}
+    \begin{split}
+        \Probability{\left| \tilde{n} - n \right| \geq \epsilon n}
+        &= \Probability{\left| \frac{(1 + c)^{X} - 1}{c} - n \right| \geq \epsilon n} \\
+        &= \Probability{\left| (1 + c)^{X} - 1 - cn \right| \geq \epsilon cn} \\
+        &= \Probability{\left| (1 + c)^{X} - \Expectation{(1 + c)^{X}} \right| \geq \epsilon cn} \\
+        &\leq \frac{\Variance{(1 + c)^{X}}}{(\epsilon cn)^{2}} \\
+        &= \frac{c^{3} n (n-1)}{2 \epsilon^{2} c^{2} n^{2}}
+        \approx \frac{c}{2 \epsilon^{2}}
+    \end{split}
+\end{align}
+
+\subsection*{\textbf{Discussion on the value of $c$}}
+We want to find how small $c$ should be so that the estimator $\tilde{n}$ satisfies
+$\left| \tilde{n} - n \right| \leq \epsilon n$ with probability at least $0.9$. So, we have
+\begin{align}
+    \begin{split}
+        \Probability{\left| \tilde{n} - n \right| \leq \epsilon n} &\geq 0.9 \\
+        \implies
+        \Probability{\left| \tilde{n} - n \right| \geq \epsilon n} &\leq 0.1 \\
+        \implies \frac{c}{2 \epsilon^{2}} &\leq 0.1
+        \quad \text{or} \quad c \leq 0.2 \epsilon^{2}
+    \end{split}
+\end{align}
+\textbf{Note:} This actually suggests that $c$ should be less than 1 as opposed to the
+given constraint $c > 1$, which makes sense, since a smaller $c$ corresponds to \textit{more}
+frequent increments of the counter, which decreases the error.
+
+\subsection*{\textbf{A bound for $S(n)$}}
+We want to obtain an upper bound on $S(n)$, the space required by the algorithm to store
+the counter value. We see that
+\begin{equation}
+    (1 + c)^{\Expectation{X_{n}}} \leq \Expectation{(1 + c)^{X_{n}}} = 1 + nc
+    \quad \text{by Jensen's Inequality}
+\end{equation}
+So we have
+\begin{align}
+    \begin{split}
+        (1 + c)^{\Expectation{X_{n}}} &\leq 1 + nc \\
+        \implies \log{\left( (1 + c)^{\Expectation{X_{n}}} \right)} &\leq \log{(1 + nc)} \\
+        \implies \Expectation{X_{n}} &\leq \frac{\log{(1 + nc)}}{\log{(1 + c)}}
+        \leq \frac{1}{c} \log{(1 + nc)} \quad \because c < 1
+    \end{split}
+\end{align}
+Though the base of the logarithm does not matter, we consider log base 2.
+This suggests that after $n$ rounds, the expected value of the counter is $O(\log{n})$, which
+means that the space required to store the counter value is $O(\log{\log{n}})$ in expectation.
+If we consider $c$ to be a variable, we require $O(\log{\log{(nc)^{\frac{1}{c}}}})$ space.
+
+\section*{\textbf{Solution 2.}}
+We are given a set of independent integers $X_{1}$, $X_{2}$, $\dots$, $X_{n}$,
+drawn uniformly from $\{ 0, 1, 2 \}$. Let us find the expected value of the
+random variable $X_{i}$ $(0 \leq i \leq n)$.
+\begin{equation}
+    \Expectation{X_{i}} = \sum_{x=0}^{2} x \ \Probability{X_{i} = x}
+    = \sum_{x=0}^{2} x \cdot \frac{1}{3}
+    = 0 + \frac{1}{3} + \frac{2}{3} = 1
+\end{equation}
+Given $X = \sum_{i=1}^{n} X_{i}$, we have
+\begin{equation}
+    \Expectation{X} = \Expectation{\sum_{i=1}^{n} X_{i}}
+    = \sum_{i=1}^{n} \Expectation{X_{i}}
+    = \sum_{i=1}^{n} 1 = n = \mu \quad \text{(say)}
+\end{equation}
+To derive a Chernoff bound, we find the moment generating functions of
+$X_{i}$ $(0 \leq i \leq n)$ and $X$.
+\begin{align}
+    \begin{split}
+        M_{X_{i}}(t) &= \Expectation{e^{tX_{i}}}
+        = \sum_{x=0}^{2} e^{tx} \ \Probability{X_{i} = x}
+        = \frac{1}{3} \left( 1 + e^{t} + e^{2t} \right)
+    \end{split} \\
+    \begin{split}
+        M_{X}(t) &= \prod_{i=1}^{n} M_{X_{i}}(t) \quad \text{(by independence)} \\
+        &= \prod_{i=1}^{n} \frac{1}{3} \left( 1 + e^{t} + e^{2t} \right)
+        = \left( \frac{1 + e^{t} + e^{2t}}{3} \right)^{\mu} \quad \because \mu = n
+    \end{split}
+\end{align}
+We now apply the following inequality derived from Markov's inequality (covered in class)
+\begin{equation}
+    \Probability{X \geq a} = \Probability{e^{tX} \geq e^{ta}} \leq \frac{M_{X}(t)}{e^{ta}} \quad (t > 0)
+\end{equation}
+For our case, we get
+\begin{equation}
+    \Probability{X \geq a} \leq \frac{M_{X}(t)}{e^{ta}}
+    \leq \frac{\left( 1 + e^{t} + e^{2t} \right)^{\mu}}{3^{\mu} e^{ta}}
+\end{equation}
+Now, we set $a = (1 + \delta) \mu$ (note $\mu = n$) and $t = \ln{(1 + \delta)}$
+to get the Chernoff bound
+\begin{align}
+    \label{eq:chernoff-bound-upper-tail}
+    \begin{split}
+        \Probability{X \geq (1 + \delta) \mu}
+        &\leq \frac{\left( 1 + e^{\ln{(1 + \delta)}} + e^{2 \ln{(1 + \delta)}} \right)^{\mu}}
+        {3^{\mu} e^{\mu (1 + \delta) \ln{(1 + \delta)}}} \\
+        &= \left( \frac{1 + (1 + \delta) + (1 + \delta)^{2}}{3 (1 + \delta)^{(1 + \delta)}} \right)^{\mu} \\
+        &= \left( \frac{1 + \delta + \frac{\delta^{2}}{3}}{(1 + \delta)^{(1 + \delta)}} \right)^{\mu} \\
+        &\leq \left( \frac{e^{\delta + \frac{\delta^{2}}{3}}}{(1 + \delta)^{(1 + \delta)}} \right)^{\mu}
+        \quad \because 1 + x \leq e^{x} \ \forall x \in \mathbb{R}
+    \end{split}
+\end{align}
+Similarly, we use the following inequality for the lower tail
+\begin{align}
+    \begin{split}
+        \Probability{X \leq a} = \Probability{e^{tX} \leq e^{ta}} &\leq \frac{M_{X}(t)}{e^{ta}} \quad (t < 0) \\
+        &= \frac{\left( 1 + e^{t} + e^{2t} \right)^{\mu}}{3^{\mu} e^{ta}}
+    \end{split}
+\end{align}
+Now, we set for $\delta < 1$, $a = (1 - \delta) \mu$ and $t = \ln{(1 - \delta)}$ to get the Chernoff bound
+\begin{align}
+    \label{eq:chernoff-bound-lower-tail}
+    \begin{split}
+        \Probability{X \leq (1 - \delta) \mu}
+        &\leq \frac{\left( 1 + e^{\ln{(1 - \delta)}} + e^{2 \ln{(1 - \delta)}} \right)^{\mu}}
+        {3^{\mu} e^{\mu (1 - \delta) \ln{(1 - \delta)}}} \\
+        &= \left( \frac{1 + (1 - \delta) + (1 - \delta)^{2}}{3 (1 - \delta)^{(1 - \delta)}} \right)^{\mu} \\
+        &\leq \left( \frac{e^{-\delta + \frac{\delta^{2}}{3}}}{(1 - \delta)^{(1 - \delta)}} \right)^{\mu}
+        \quad \because 1 + x \leq e^{x} \ \forall x \in \mathbb{R}
+    \end{split}
+\end{align}
+\eqref{eq:chernoff-bound-upper-tail} and \eqref{eq:chernoff-bound-lower-tail} give us the
+required Chernoff bounds for the upper and lower tails of the $X$.
+
+\section*{\textbf{Solution 3.}}
+We sample a subset $S \subseteq A$ from a set $A$ of unknown size such that $|S| = n$
+uniformly at random. We are interested in the expected number of elements in $A$ that
+hash to a value at most $t$ for a given $t < m$ where $h \sim \mathcal{H}$ is a hash
+function drawn uniformly at random from a pairwise independent family.
+
+\subsection*{\textbf{Expected number of elements in $S$ that hash to at most $t$}}
+Let $X_{i} \ (1 \leq i \leq n)$ be the indicator random variable that the $i^{th}$
+element hashes to a value at most $t$. We have
+\begin{align}
+    X &= \sum_{i=1}^{n} X_{i} \\
+    \label{eq:exp-A}
+    \begin{split}
+        \Expectation{X} = \Expectation{\sum_{i=1}^{n} X_{i}}
+        &= \sum_{i=1}^{n} \Expectation{X_{i}}
+        = \sum_{i=1}^{n} \Probability{h(a_{i}) \leq t} \\
+        &= \sum_{i=1}^{n} \Probability{\bigcup_{j=1}^{t} h(a_{i}) = j} \\
+        &= \sum_{i=1}^{n} \sum_{j=1}^{t} \Probability{h(a_{i}) = j}
+        \quad \text{(disjoint events)} \\
+        &= \frac{nt}{m} \quad \text{(by universality)}
+    \end{split}
+\end{align}
+Using the fact that pairwise independence is a stonger condition, and implies
+universality. Thus, the expected number of elements in $S$ that hash to a value at
+most $t$ is $\frac{nt}{m}$.
+
+\subsection*{\textbf{Using the sampling strategy as an estimator for $|A|$}}
+Let us say we sample some $n$ elements from $A$. We derive an estimator $\tilde{A}$
+of $|A|$ as follows
+\begin{equation}
+    \tilde{A} = \frac{m}{t} X
+\end{equation}
+By \eqref{eq:exp-A}, we have
+\begin{equation}
+    \Expectation{\tilde{A}} = \Expectation{\frac{m}{t} X} = \frac{m}{t} \Expectation{X} = n
+\end{equation}
+Next, we find the variance of $\tilde{A}$
+\begin{align}
+    \begin{split}
+        \Variance{\tilde{A}} &= \Variance{\frac{m}{t} X}
+        = \left( \frac{m}{t} \right)^{2} \Variance{X} \\
+        &= \left( \frac{m}{t} \right)^{2} \Variance{\sum_{i=1}^{n} X_{i}} \\
+        &\leq \left( \frac{m}{t} \right)^{2} \sum_{i=1}^{n} \Variance{X_{i}} \\
+        &= \left( \frac{m}{t} \right)^{2} n \left( \frac{t}{m} \right) \left( 1 - \frac{t}{m} \right) \\
+        &= \frac{n(1-t)}{t} \leq \frac{n}{t} \quad \text{(if you will)}
+    \end{split}
+\end{align}
+We can now bound the error of our estimator $\tilde{A}$ using Chebyshev's inequality
+\begin{align}
+    \begin{split}
+        \Probability{\left| \tilde{A} - \Expectation{\tilde{A}} \right| \geq \epsilon n}
+        &\leq \frac{\Variance{\tilde{A}}}{(\epsilon n)^{2}} \\
+        &\leq \frac{1-t}{\epsilon^{2} nt}
+    \end{split}
+\end{align}
+For a given $\delta < 1$, we can find the minimum value of $t$ such that
+\begin{align}
+    \label{eq:min-t}
+    \begin{split}
+        \Probability{\left| \tilde{A} - \Expectation{\tilde{A}} \right| \geq \epsilon n} &\leq \delta \\
+        \implies \frac{1-t}{\epsilon^{2} nt} &\leq \delta
+        \implies t \geq \frac{1}{1 + \epsilon^{2} n \delta}
+    \end{split}
+\end{align}
+\eqref{eq:min-t} suggests that for a given $(\epsilon, \delta)$ pair, we can choose a
+$t \geq \frac{1}{1 + \epsilon^{2} n \delta}$ to ensure that our estimator $\tilde{A}$
+is \textit{good}.
+
+\subsection*{\textbf{Estimating $|A \cup B|$}}
+Assuming $A, B \subseteq U$ for some universe $U$ of elements, let us say we sample $n_{a}$ elements
+from $A$ and $n_{b}$ elements from $B$. By the above arguments, we can derive estimators $\tilde{Z}_{A}$
+and $\tilde{Z}_{B}$ for $|A|$ and $|B|$ as
+\begin{equation}
+    \tilde{Z}_{A} = \frac{m}{t} X_{a} \quad \text{and} \quad \tilde{Z}_{B} = \frac{m}{t} X_{b}
+\end{equation}
+where $X_{a}$ and $X_{b}$ are the number of elements in $A$ and $B$ that hash to a value
+at most $t$. We can now derive estimators for $|A \cup B|$ as follows
+\begin{align}
+    \tilde{Z}_{A \cup B} &= \tilde{Z}_{A} + \tilde{Z}_{B}
+\end{align}
+We can now find the expectation and variance of $\tilde{Z}_{A \cup B}$ and apply Chebyshev's
+inequality to get a bound on the error of our estimator.
+\begin{align}
+    \Expectation{\tilde{Z}_{A \cup B}} = \Expectation{\tilde{Z}_{A}} + \Expectation{\tilde{Z}_{B}} &= n_{a} + n_{b} \\
+    \Variance{\tilde{Z}_{A \cup B}} = \Variance{\tilde{Z}_{A}} + \Variance{\tilde{Z}_{B}}
+    &\leq \frac{(n_{a} + n_{b})(1-t)}{t}
+\end{align}
+We can now apply Chebyshev's inequality to get a bound on the error of our estimator $\tilde{Z}_{A \cup B}$.
+\begin{align}
+    \begin{split}
+        \Probability{\left| \tilde{Z}_{A \cup B} - \Expectation{\tilde{Z}_{A \cup B}} \right| \geq \epsilon (n_{a} + n_{b})}
+        &\leq \frac{\Variance{\tilde{Z}_{A \cup B}}}{(\epsilon (n_{a} + n_{b}))^{2}} \\
+        &\leq \frac{(1-t)}{t \epsilon^{2} (n_{a} + n_{b})} \leq \delta \\
+        \implies t &\geq \frac{1}{1 + \epsilon^{2} (n_{a} + n_{b}) \delta}
+    \end{split}
+\end{align}
+\textbf{Note:} I guess I do not still understand the question in a sense - if we already know $n$, we can
+always say that my estimate for $|A|$ is $n$.
+
+\section*{\textbf{Solution 4.}}
+By definition, a hash function is called Universal if it is drawn from a family $h \sim \mathcal{H}$
+such that
+\begin{equation}
+    \forall \ x_{1} \neq x_{2} \in U, \ \Probability{h(x_{1}) = h(x_{2})} \leq \frac{1}{m}
+\end{equation}
+and strongly Universal if\footnote{
+    \textbf{Note:} The notation $[m]$ here denotes the set $\{0, 1, \dots, m-1\}$
+    as opposed to the usual $\{1, 2, \dots, m\}$.
+}
+\begin{equation}
+    \forall \ x_{1} \neq x_{2} \in U, \ \Probability{h(x_{1}) = y_{1} \cap h(x_{2}) = y_{2}}
+    = \frac{1}{m^{2}} \quad \text{for some} \ y_{1}, y_{2} \in [m]
+\end{equation}
+We want to find an example of a hash function which is Universal, but not strongly Universal.
+Let us say $U = \mathbb{Z}$. Let $m$ be the size of the hash table and $p$ be a sufficiently
+large prime. Consider the following family $\mathcal{H}$ of hash functions
+$h: \mathbb{Z} \rightarrow [m]$
+\begin{equation}
+    \mathcal{H} = \{ h_{a}(x) = ax \bmod p \bmod m \mid a = 1, 2, \dots, p-1 \}
+\end{equation}
+Consider any $h \sim \mathcal{H}$ chosen uniformly at random. Let us find the probability
+for any $x \in U, j \in [m]$ that
+\begin{align}
+    \begin{split}
+        \Probability{h(x) = j} &= \sum_{i=1}^{p-1} \Probability{h_{i}(x) = j} \Probability{h = h_{i}} \\
+        &= \frac{1}{p-1} \sum_{i=1}^{p-1} \Probability{h_{i}(x) = j} \quad h \text{ is chosen uniformly} \\
+        &= \frac{1}{p-1} \cdot (p-1) \cdot \left( \frac{p}{m} \cdot \frac{1}{p} \right) = \frac{1}{m}
+    \end{split}
+\end{align}
+since for any $h_{i}$, the probability that $h_{i}(x) = j$ is that the $\bmod p$ operation
+maps $ax$ to one of the $\frac{p}{m}$ locations that are congruent to $j \bmod m$.
+We have, for any $x_{1} \neq x_{2} \in \mathbb{Z}$,
+\begin{align}
+    \begin{split}
+        \Probability{h_{a}(x_{1}) = h_{a}(x_{2})}
+        &= \sum_{i=0}^{m-1} \Probability{h_{a}(x_{2}) = i \mid h_{a}(x_{1}) = i}
+        \Probability{h_{a}(x_{1}) = i} \\
+        &= \sum_{i=0}^{m-1} \left( \frac{p}{m} \cdot \frac{1}{p} \right) \frac{1}{m}
+        = \frac{1}{m}
+    \end{split}
+\end{align}
+where we use the fact that collisions can only occur due to clashses in $\bmod m$. Since $p$
+is a large prime, it is impossible that $a(x_{1} - x_{2}) \bmod p \equiv 0$ for $x_{1} \neq x_{2}$.
+Thus, $\mathcal{H}$ is Universal. However, we have
+\begin{equation}
+    \Probability{h_{a}(x_{1}) = y_{1} \cap h_{a}(x_{2}) = y_{2}}
+    = \Probability{h_{a}(x_{2}) = y_{2} \mid h_{a}(x_{1}) = y_{1}} \Probability{h_{a}(x_{1}) = y_{1}}
+\end{equation}
+So, we solve the following equation
+\begin{align}
+    \begin{split}
+        ax_{1} \bmod p \bmod m &= y_{1} \\
+        \implies ax_{1} \bmod p &\equiv y_{1} \bmod m \\
+        \implies ax_{1} &\equiv y_{1} \bmod m \bmod p \\
+        \implies a &\equiv x_{1}^{-1} y_{1} \bmod m \bmod p
+    \end{split}
+\end{align}
+where $z^{-1}$ denotes the modular inverse of $z$ modulo $p$. Since $a$ anyway lies between $1$ and $p-1$,
+this suggests that $x_{1}$ and $y_{1}$ uniquely determine $a$. Similarly, there can only be one value of
+$1 \leq a < p$ for which $h_{a}(x_{2}) = y_{2}$. Thus,
+\begin{align}
+    \begin{split}
+        \Probability{h_{a}(x_{1}) = y_{1} \cap h_{a}(x_{2}) = y_{2}}
+        &= \Probability{h_{a}(x_{2}) = y_{2} \mid h_{a}(x_{1}) = y_{1}} \Probability{h_{a}(x_{1}) = y_{1}} \\
+        &= \frac{1}{p-1} \cdot \frac{1}{m} < \frac{1}{m^{2}}
+        \quad \because p > m
+    \end{split}
+\end{align}
+Thus, $\mathcal{H}$ is Universal, but not strongly Universal.
+
+\section*{\textbf{Solution 5.}}
+\textbf{Note:} Used different variables than the ones given in the question.
+\vspace*{7pt} \\
+We asume that answers given by different people are independent. Let us use the random
+variables $X_{i} \ (1 \leq i \leq n)$
+\begin{equation}
+    X_{i} = \begin{cases}
+        1 & \text{if the } i^{th} \text{ person answers yes} \\
+        0 & \text{otherwise}
+    \end{cases}
+\end{equation}
+with $\Probability{X_{i} = 1} = p$. Let our estimate for the fraction $p$ be
+\begin{equation}
+    \tilde{p} = \frac{X}{n} = \frac{1}{n} \sum_{i=1}^{n} X_{i}
+\end{equation}
+where $X$ is the number of people who want their president impeached and $n$ is the
+total number of people surveyed. We first find the expectation and variance
+of $\tilde{p}$. We have
+\begin{align}
+    \Expectation{\tilde{p}} = \Expectation{\frac{1}{n} \sum_{i=1}^{n} X_{i}}
+    &= \frac{1}{n} \sum_{i=1}^{n} \Expectation{X_{i}}
+    = \frac{1}{n} \sum_{i=1}^{n} p = p \\
+    \begin{split}
+        \Variance{\tilde{p}} = \Variance{\frac{1}{n} \sum_{i=1}^{n} X_{i}}
+        &= \frac{1}{n^{2}} \sum_{i=1}^{n} \Variance{X_{i}}
+        \quad \text{(by independence)} \\
+        &= \frac{1}{n^{2}} \sum_{i=1}^{n} p(1-p) = \frac{p(1-p)}{n}
+    \end{split}
+\end{align}
+We want the estimator $\tilde{p}$ to satisfy $\Probability{\left| \tilde{p} - p \right| \leq \epsilon p} \geq 1 - \delta$.
+We apply Chebyshev's inequality to get the required bound on the error
+\begin{align}
+    \begin{split}
+        \Probability{\left| \tilde{p} - p \right| \geq \epsilon p}
+        &= \Probability{\left| \tilde{p} - \Expectation{\tilde{p}} \right| \geq \epsilon p} \\
+        &\leq \frac{\Variance{\tilde{p}}}{(\epsilon p)^{2}} \\
+        &= \frac{p(1-p)}{n (\epsilon p)^{2}}
+        = \frac{1-p}{n \epsilon^{2} p}
+    \end{split}
+\end{align}
+We want
+\begin{align}
+    \begin{split}
+        \Probability{\left| \tilde{p} - p \right| \leq \epsilon p} &\geq 1 - \delta \\
+        \implies
+        \Probability{\left| \tilde{p} - p \right| \geq \epsilon p} &\leq \delta \\
+    \end{split}
+\end{align}
+We can now find the minimum number of people $n$ we need to survey to ensure that
+our estimator $\tilde{p}$ satisfies the required error bound. We can find $n$ upto
+varying degrees of looseness as follows
+\vfill
+\begin{align}
+    \begin{split}
+        \frac{1 - p}{n \epsilon^{2} p} &\leq \frac{e^{-p}}{n \epsilon^{2} p}
+        \leq \frac{1}{n \epsilon^{2} p} \leq \delta \\
+        \implies n \geq \frac{1}{\delta \epsilon^{2} p} &\geq \frac{e^{-p}}{\delta \epsilon^{2} p}
+        \geq \frac{1 - p}{\delta \epsilon^{2} p}
+    \end{split}
+\end{align}
+The inequalities above present the minimum number of people $n$ we must to ensure that our
+estimator $\tilde{p}$ satisfies the required error bound.
+
+\vfill
+
+\section*{References}
+\begin{enumerate}
+    \item \href{https://drive.google.com/file/d/1fsjxaczfe_vfDVeBlToF6bUzV_rqzGPu/view}
+    {Lecture Notes on \textit{Approximate Counting using Morris Counter}, CSE5223
+    (Winter 2024), Dr. Rajiv Raman}
+\end{enumerate}
+
+\end{document}
