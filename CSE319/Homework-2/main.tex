@@ -29,73 +29,62 @@
 
 \section*{Solution 1.}
 \subsection*{Part (a)}
-In the naïve implementation, we regrow the tree (taking $O(m)$ time) after each price update.
-We do this for each of the $O(n)$ iterations in one phase. We modify the BFS procedure to
-ensure that the total work done in creating the search tree over $O(n)$ iterations of the
-phase is $O(m)$. Along with a BFS-queue $Q$, we also maintain a set $S$ of currently
-`\textit{un-tight}' edges, i.e.
-\begin{equation}
-    S = \{ (u, v) \in E \mid w(u, v) - p_{u} - p_{v} \neq 0, u \in Q \}
-\end{equation}
-\begin{figure}[htbp]
-    \centering
-    \begin{tikzpicture}[node distance=2cm, auto]
-        \tikzstyle{node} = [draw, circle, minimum size=0.65cm, fill=black, text=white]
-        \tikzstyle{tight} = [-{stealth}, thick]
-        \tikzstyle{untight} = [-{stealth}, dashed, thick]
-        \node[node] (R) at (0,0) {$r$};
-        \node[node] (A) at (-4,-2) {$A$};
-        \node[node] (B) at (-1.5,-2) {$B$};
-        \node[node] (C) at (1.5,-2) {$C$};
-        \node[node] (D) at (4,-2) {$D$};
-        \path[tight]
-        (R) edge node {} (A)
-        (R) edge node {} (B)
-        (R) edge node {} (C);
-        \path[untight]
-        (R) edge node {} (D);
-    \end{tikzpicture}
-    \caption{$(r, A)$, $(r, B)$, and $(r, C)$ are tight and added to $Q$. $(r, D)$ is un-tight and added to $S$.}
-\end{figure}
-\vspace*{0pt} \\
-The idea is as follows. At the start of the phase, add $r \in L$ to $Q$. While $Q$ is not empty,
+We modify the BFS procedure to ensure that the total work done in creating the search tree over
+$O(n)$ iterations of each phase is $O(m)$. Along with the BFS-queue $Q$, we maintain two boolean
+properties, $\textbf{odd}[v]$ and $\textbf{even}[v]$, for each vertex $v \in V$. As the name
+suggests,
 \begin{itemize}
-    \item Pop a node $u$ from $Q$.
-    \item For each edge $(u, v) \in E$, if $w(u, v) - p_{u} - p_{v} = 0$, add $v$ to $Q$,
-    otherwise, add $(u, v)$ to $S$.
+    \item $\textbf{odd}[v]$ and $\textbf{even}[v]$ are initialized as $\textsc{Null}$, meaning
+    that $v$ has not been visited in the search tree yet.
+    \item $\textbf{odd}[v] = \textsc{True}$ when $v$ has been visited at an odd level in the
+    tree, i.e. has been visited as an odd vertex.
+    \item $\textbf{even}[v] = \textsc{True}$ when $v$ has been visited at an even level in the
+    tree, i.e. has been visited as an even vertex.
 \end{itemize}
-Once we get `\textit{stuck}', we perform a price update as usual for all explored vertices
-in $L$ and $R$. Next, we find the edges in $S$ made tight by the price update\footnote{Note
-that there can be multiple.}. Let these edges be
-$T_{N} = \{ (u, v) \in S \mid w(u, v) - p_{u} - p_{v} = 0 \}$. We add the vertices
-$V' = \{ v \mid (u, v) \in T_{N} \}$ to $Q$ and continue the BFS (as opposed to starting a
-BFS from scratch). We repeat this process until a good path $P$ is found. \\
-Since we grow one search tree per phase, each edge is considered at most twice (once while
-adding it to $S$ and once while exploring it, if at all). Thus, the total work done searching
-for good paths over all the $O(n)$ iterations of one phase is now $O(m)$. This obviously
-excludes the work done to compute $\delta$s and update prices.
+We proceed with the BFS as usual. Once we get \textit{stuck} and update the vertex prices, we
+get a set $S$ of the new tight edges. For each edge $(u, v) \in S$, one of the following cases
+can arise
+\begin{itemize}
+    \item Neither $u$ nor $v$ have been visited. In this case, we discard $(u, v)$.
+    \item $\textbf{even}[u] = \textsc{True}$. In this case, we set $\textbf{odd}[v] = \textsc{True}$
+    and run our modified BFS from $v$ if $\textbf{odd}[u] = \textsc{True}$.
+    \item Only $\textbf{odd}[u] = \textsc{True}$. Here, we do not visit $v$ since we only
+    select the matched edges for odd vertices.
+    \item In all other cases, discard $(u, v)$.
+\end{itemize}
+During our modified BFS, if we ever encounter a vertex $v$ at an odd level with
+$\textbf{odd}[v] = \textsc{True}$ already, or a vertex $v$ at an even level with
+$\textbf{even}[v] = \textsc{True}$ already, we do not expand it further. This is
+because revisiting a vertex with the same parity does not lead to a new path to an
+unvisited vertex. \\
+Now, each edge $(u, v)$ on the search tree is visited at most twice, once when $u$ is being
+visited as an odd vertex and once when even. Thus, the total work done searching for good paths
+over all the $O(n)$ iterations of one phase is now $O(m)$. This obviously excludes the work
+done to compute $\delta$s and update prices.
 
 \subsection*{Part (b)}
-We know that the value of $\delta$ for a price update can be computed in $O(m)$ per iteration
-in each phase. For each phase, we also maintain a min-heap $H$, along with the BFS-queue $Q$
-and set $S$. The heap is structured as $[\textsc{Priority}, \textsc{Item}]$.
+To compute the value of $\delta$ for all price updates in a phase in $O(m \log{n})$ time,
+we now also maintain a min-heap $H_{i}$ for each phase $i$, along with the BFS-queue $Q$
+and the vertex properties. The heap is structured as $[\textsc{Priority}, \textsc{Item}]$.
 \begin{equation}
-    H = \{ [p_{v}, v] \mid (u, v) \in S \}
+    H_{i}= \{ [\hat{w}_{uv}, (u, v)] \mid \hat{w}_{uv} = w_{uv} - p_{u} - p_{v} \neq 0
+    \textbf{ and } v \text{ is at an even level} \}
 \end{equation}
-Just like the set $S$, the heap $H$ is built incrementally. While BFS-ing, when we encounter
-an un-tight edge $e = (u, v)$, we add $e$ to $S$ and $[p_{v}, v]$ to $H$. As expected, we
-set\footnote{For consistency with $S$, we need to $\Call{Extract-min}{H}$ until $\Call{Top}{H}$
-(the minimum value in $H$) exceeds the first selected $\delta$.}
+he heap $H_{i}$ is built incrementally during the search. While BFS-ing, when we encounter
+an un-tight edge $e = (u, v)$ with $v$ at an even level, we insert $[\hat{w}_{uv}, (u, v)]$
+to $H_{i}$. This ensures that the heap only contains edges of where $u$ is at an odd level
+and $v$ is at an even level. As expected, we get the $\delta$ for a price update by
 \begin{equation}
-    [\delta, \_] \gets \Call{Extract-min}{H}
+    [\delta, \_] \gets \Call{Extract-min}{H_{i}}
 \end{equation}
 The time complexity of each extraction depends on the total number of elements $k$ in the heap.
-There can be at most $n^{2}$ (non-distinct) elements in the heap during the phase. We do not
-need to worry about duplicates since the extraction time is proportional to $\log{k}$, and
-$\log{n^{2}} = 2 \log{n} = O(\log{n})$. Finally, there can be at most $O(m)$ inserts during the
-search tree expansion and at most $O(m)$ extractions\footnote{$O(n)$ extractions should be
-enough, but to take care of duplicates, we might need to extract all the elements inserted in
-$H$.} overall during the phase. \\
+There can be at most $m \leq n^{2}$ elements in the heap during the phase\footnote{It is
+interesting to see that there may be at most $m$ duplicates of each edge in the heap, but
+$\log{m^{2}} \leq \log{n^{4}} = 4 \log{n} = O(\log{n})!$}. So, the extraction time is
+proportional to $\log{k}$, and $\log{n^{2}} = 2 \log{n} = O(\log{n})$. Finally, there can be
+at most $O(m)$ inserts during the search tree expansion and at most $O(m)$ extractions
+\footnote{I suspect $O(n)$ extractions should be enough, but let us go with the upper bound.}
+overall during the phase. \\
 Thus, the total time spent in computing $\delta$s over the entire phase is $O(m \log{n})$. This
 yields an $O(mn \log{n})$ Hungarian Algorithm, as there can be at most $O(n)$ phases, and each
 phase can be implemented in $O(m + m\log{n})$ time.
@@ -159,13 +148,14 @@ array $P[1:n]$ such that
 \begin{equation}
     P[i+1] = \sum_{j=1}^{i} w_{j} = \sum_{j=1}^{i} d_{G}(j, j+1) \quad \forall i \in [n-1]
 \end{equation}
-\vfill
-\pagebreak
-\hspace*{-19pt}
-Using the prefix sum array $P$, we gain immediate access to the distance between any two
-vertices
+It is important to note the indices of $P$ since it is an $n$-sized array. Using the prefix
+sum array $P$, we gain immediate access to the distance between any two vertices by
+$d_{G}(u, v) = P[v] - P[u]$ for $u < v \in [n]$. Thus, we define
 \begin{equation}
-    d_{G}(u, v) = d_{G}(v, u) = P[v] - P[u] \quad \forall u < v \in [n]
+    d_{G}(u, v) = \begin{cases}
+        P[v] - P[u] & u < v \\
+        d_{G}(v, u) & \text{otherwise}
+    \end{cases}
 \end{equation}
 We also need to calculate $m$ for any given $(i, j)$ pair. As per our requirement,
 $m = \textsc{Median}_{G}(i, j)$ suffices, which denotes the middle point between $i$ and
@@ -201,7 +191,6 @@ solution is given in Algorithm \ref{algo:line-k-point-facility}.
         \EndProcedure
     \end{algorithmic}
 \end{algorithm}
-\vspace*{-12pt}
 \begin{algorithm}[H]
     \caption{Solve the $k$-point Facility Problem on an edge-weighted path}
     \label{algo:line-k-point-facility}
