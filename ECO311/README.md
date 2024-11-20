@@ -11,4 +11,4 @@ It aims to enable students to:
 
 ## About the Assignments
 
-This repository contains the solutions to the take-home assignment given in the duration of the course.
+This repository contains the solutions to the take-home quiz and bonus quiz given in the duration of the course.
