@@ -8,3 +8,5 @@ This repository contains some documents that were created to learn the basics of
 - Some class notes for the course Multivariate Calculus
 - Theory Assignments for the course Algorithms under Uncertainty
 - Theory Assignments for the course Randomized Algorithms
+- Theory Assignments for the course Modern Algorithm Design
+- Assignments for the course Game Theory
